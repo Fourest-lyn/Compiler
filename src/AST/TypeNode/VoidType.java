@@ -5,9 +5,10 @@ import Util.Position;
 
 public class VoidType extends Type
 {
-    public VoidType(Position pos)
+    //todo: change the typename
+    public VoidType(Position pos,String typeName)
     {
-        super(pos);
+        super(pos,typeName);
     }
 
     @Override

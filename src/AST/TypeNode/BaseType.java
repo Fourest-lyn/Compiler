@@ -5,9 +5,9 @@ import Util.Position;
 
 public class BaseType extends Type
 {
-    public BaseType(Position pos)
+    public BaseType(Position pos,String typeName)
     {
-        super(pos);
+        super(pos,typeName);
     }
 
     @Override

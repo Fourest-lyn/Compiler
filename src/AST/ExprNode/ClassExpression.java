@@ -11,8 +11,5 @@ public class ClassExpression extends Expression
     }
 
     @Override
-    public void accept(ASTVisitor visitor)
-    {
-        visitor.visit(this);
-    }
+    public void accept(ASTVisitor visitor) {visitor.visit(this);}
 }

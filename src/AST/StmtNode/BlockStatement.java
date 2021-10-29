@@ -12,7 +12,7 @@ public class BlockStatement extends Statement
     public BlockStatement(Position pos)
     {
         super(pos);
-        stmts=new ArrayList<>();
+        this.stmts=new ArrayList<>();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package AST;
 
 import AST.DefineNode.ClassDefine;
+import AST.DefineNode.ConstructDefine;
 import AST.DefineNode.FunctionDefine;
 import AST.DefineNode.ValueDefine;
 import AST.ExprNode.*;
@@ -31,10 +32,12 @@ public interface ASTVisitor
     public void visit(IndexExpression   expr);
     public void visit(FuncExpression    expr);
     public void visit(UnaryExpression   expr);
+    public void visit(LambdaExpression  expr);
 
     public void visit(ValueDefine       def);
     public void visit(FunctionDefine    def);
     public void visit(ClassDefine       def);
+    public void visit(ConstructDefine   def);
 
     public void visit(BaseType          type);
     public void visit(VoidType          type);

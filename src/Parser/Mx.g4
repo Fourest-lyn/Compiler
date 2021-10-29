@@ -15,7 +15,7 @@ returnType: type | VOID;
 functionParameter: (type IDENTIFIER (',' type IDENTIFIER)*)?;
 functionDefine: returnType IDENTIFIER '(' functionParameter ')' suite;
 lambdaFunction: '[''&'']'('('functionParameter')')? '->' '{' statement '}' '('valueList')';
-functionCall: lambdaFunction | IDENTIFIER'('valueList?')';
+functionCall: IDENTIFIER'('valueList?')';
 
 classConstructor: IDENTIFIER '('')' suite;
 classDefine: CLASS IDENTIFIER '{' (valueDefine | classConstructor | functionDefine)* '}'';';
@@ -54,6 +54,7 @@ expression
     | <assoc=right> expression '=' expression               #assignExpr
     | <assoc=right> NEW newType                             #newExpr
     | functionCall                                          #funtionExpr
+    | lambdaFunction                                        #lambdaExpr
     | classAccess                                           #classExpr
 
 ;

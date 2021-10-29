@@ -1,13 +1,12 @@
-package AST.ExprNode;
+package AST.DefineNode;
 
+import AST.ASTNode;
 import AST.ASTVisitor;
 import Util.Position;
 
-public class NewExpression extends Expression
+public class ConstructDefine extends ASTNode
 {
-    //todo:
-
-    public NewExpression(Position pos)
+    public ConstructDefine(Position pos)
     {
         super(pos);
     }

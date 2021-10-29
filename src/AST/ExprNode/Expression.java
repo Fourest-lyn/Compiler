@@ -5,9 +5,7 @@ import Util.Position;
 
 abstract public class Expression extends ASTNode
 {
-    //todo:
-    public Expression(Position pos)
-    {
-        super(pos);
-    }
+    public boolean constFlag=false;
+
+    public Expression(Position pos) {super(pos);}
 }

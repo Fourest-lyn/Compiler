@@ -3,14 +3,13 @@ package AST.ExprNode;
 import AST.ASTVisitor;
 import Util.Position;
 
-public class IdExpression extends Expression
+public class LambdaExpression extends Expression
 {
-    public Expression identifier;
+    //todo
 
-    public IdExpression(Position pos,Expression identifier)
+    public LambdaExpression(Position pos)
     {
         super(pos);
-        this.identifier=identifier;
     }
 
     @Override
