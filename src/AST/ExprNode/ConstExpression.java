@@ -1,14 +1,14 @@
 package AST.ExprNode;
 
 import AST.ASTVisitor;
+import AST.TypeNode.BaseType;
 import Util.Position;
 
 public class ConstExpression extends Expression
 {
-    public enum ConstKind{INTEGER,STRING,BOOL,NULL}
-    public ConstKind kind;
+    public String kind;
 
-    public ConstExpression(Position pos,ConstKind kind)
+    public ConstExpression(Position pos,String kind)
     {
         super(pos);
         this.constFlag=true;

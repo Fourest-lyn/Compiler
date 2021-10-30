@@ -6,7 +6,6 @@ import Util.Position;
 
 abstract public class Type extends ASTNode
 {
-    //todo
     private final String typeName;
 
     public Type(Position pos,String name)

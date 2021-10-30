@@ -27,7 +27,6 @@ public interface ASTVisitor
     public void visit(NewExpression     expr);
     public void visit(ConstExpression   expr);
     public void visit(IdExpression      expr);
-    public void visit(IncrExpression    expr);
     public void visit(ClassExpression   expr);
     public void visit(IndexExpression   expr);
     public void visit(FuncExpression    expr);

@@ -2021,28 +2021,6 @@ public class MxParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
-	public static class IncrExprContext extends ExpressionContext {
-		public Token op;
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
-		}
-		public TerminalNode SELFPLUS() { return getToken(MxParser.SELFPLUS, 0); }
-		public TerminalNode SELFMINUS() { return getToken(MxParser.SELFMINUS, 0); }
-		public IncrExprContext(ExpressionContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof MxListener ) ((MxListener)listener).enterIncrExpr(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof MxListener ) ((MxListener)listener).exitIncrExpr(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MxVisitor ) return ((MxVisitor<? extends T>)visitor).visitIncrExpr(this);
-			else return visitor.visitChildren(this);
-		}
-	}
 	public static class AssignExprContext extends ExpressionContext {
 		public ExpressionContext left;
 		public ExpressionContext right;
@@ -2466,15 +2444,15 @@ public class MxParser extends Parser {
 						break;
 					case 11:
 						{
-						_localctx = new IncrExprContext(new ExpressionContext(_parentctx, _parentState));
+						_localctx = new UnaryExprContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(314);
 						if (!(precpred(_ctx, 9))) throw new FailedPredicateException(this, "precpred(_ctx, 9)");
 						setState(315);
-						((IncrExprContext)_localctx).op = _input.LT(1);
+						((UnaryExprContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
 						if ( !(_la==SELFPLUS || _la==SELFMINUS) ) {
-							((IncrExprContext)_localctx).op = (Token)_errHandler.recoverInline(this);
+							((UnaryExprContext)_localctx).op = (Token)_errHandler.recoverInline(this);
 						}
 						else {
 							if ( _input.LA(1)==Token.EOF ) matchedEOF = true;

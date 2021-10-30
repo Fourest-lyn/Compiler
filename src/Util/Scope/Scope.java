@@ -14,6 +14,10 @@ public class Scope
     private Scope parentScope;
     public Map<String,FunctionDefine> functions;
     public Map<String, Type> variables;
+    public boolean classFlag=false,functionFlag=false;
+    public Type classType=null;
+    public Type functionType=null;
+    public int loopStage=0;
 
     public Scope(Scope parentScope)
     {

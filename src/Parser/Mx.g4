@@ -51,7 +51,7 @@ expression
     | left=expression op = ('&'|'|'|'^') right=expression   #binaryExpr
     | left=expression op = ('&&'|'||') right=expression     #binaryExpr
     | left=expression op = ('+'|'-') right=expression       #binaryExpr
-    | expression op=('++'|'--')                             #incrExpr
+    | expression op=('++'|'--')                             #unaryExpr
     | <assoc=right> op = ('~'|'!'|'-'|'+') expression       #unaryExpr
     | <assoc=right> op=('++'|'--') expression               #unaryExpr
     | <assoc=right> left=expression '=' right=expression    #assignExpr

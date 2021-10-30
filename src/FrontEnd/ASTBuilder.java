@@ -173,7 +173,9 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
 
     @Override public ASTNode visitReturnStmt(MxParser.ReturnStmtContext ctx)
     {
-        return new ReturnStatement(new Position(ctx),(Expression) visit(ctx.expression()));
+        Expression returnValue=null;
+        if(ctx.expression()!=null) returnValue=(Expression) visit(ctx.expression());
+        return new ReturnStatement(new Position(ctx),returnValue);
     }
 
     @Override public ASTNode visitBreakStmt(MxParser.BreakStmtContext ctx)
@@ -283,15 +285,6 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
         return new BinaryExpression(new Position(ctx),op,left,right);
     }
 
-    @Override public ASTNode visitIncrExpr(MxParser.IncrExprContext ctx)
-    {
-        Expression leftExpr= (Expression) visit(ctx.expression());
-        IncrExpression.Operator op=null;
-        if(ctx.SELFPLUS()!=null) op= IncrExpression.Operator.SELFINC;
-        else op= IncrExpression.Operator.SELFDEC;
-        return new IncrExpression(new Position(ctx),leftExpr,op);
-    }
-
     @Override public ASTNode visitAssignExpr(MxParser.AssignExprContext ctx)
     {
         Expression left=(Expression) visit(ctx.left);
@@ -316,11 +309,11 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
     @Override
     public ASTNode visitLiteral(MxParser.LiteralContext ctx)
     {
-        ConstExpression.ConstKind kind=null;
-        if(ctx.BOOLCONST()!=null) kind= ConstExpression.ConstKind.BOOL;
-        if(ctx.NULLCONST()!=null) kind= ConstExpression.ConstKind.NULL;
-        if(ctx.STRINGCONST()!=null) kind= ConstExpression.ConstKind.STRING;
-        if(ctx.INTEGERCONST()!=null) kind= ConstExpression.ConstKind.INTEGER;
+        String kind=null;
+        if(ctx.BOOLCONST()!=null) kind= "bool";
+        if(ctx.NULLCONST()!=null) kind= "null";
+        if(ctx.STRINGCONST()!=null) kind= "string";
+        if(ctx.INTEGERCONST()!=null) kind= "int";
         return new ConstExpression(new Position(ctx),kind);
     }
 }

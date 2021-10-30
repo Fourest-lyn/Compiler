@@ -22,9 +22,5 @@ public class ClassDefine extends Define
         this.funcDefs=funcDefs;
     }
 
-    @Override
-    public void accept(ASTVisitor visitor)
-    {
-        visitor.visit(this);
-    }
+    @Override public void accept(ASTVisitor visitor) {visitor.visit(this);}
 }

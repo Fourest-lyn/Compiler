@@ -24,6 +24,14 @@ public class FunctionDefine extends Define
         this.suite=suite;
     }
 
+    public FunctionDefine(Position pos,Type returnType,String funcName)
+    {
+        super(pos);
+        this.returnType=returnType;
+        this.funcName=funcName;
+        this.paras=new FunctionParameter(pos);
+    }
+
     @Override
     public void accept(ASTVisitor visitor) {visitor.visit(this);}
 }
