@@ -1,11 +1,11 @@
-package AST.TypeNode;
+package AST.StmtNode;
 
 import AST.ASTVisitor;
 import Util.Position;
 
-public class VoidType extends Type
+public class EmptyStatement extends Statement
 {
-    public VoidType(Position pos) {super(pos,"void");}
+    public EmptyStatement(Position pos) {super(pos);}
 
     @Override public void accept(ASTVisitor visitor) {visitor.visit(this);}
 }

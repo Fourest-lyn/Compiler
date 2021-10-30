@@ -5,10 +5,14 @@ import Util.Position;
 
 public class ConstExpression extends Expression
 {
-    public ConstExpression(Position pos)
+    public enum ConstKind{INTEGER,STRING,BOOL,NULL}
+    public ConstKind kind;
+
+    public ConstExpression(Position pos,ConstKind kind)
     {
         super(pos);
         this.constFlag=true;
+        this.kind=kind;
     }
 
     @Override

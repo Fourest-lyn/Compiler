@@ -9,17 +9,19 @@ type: type'['']' | baseType;
 valueDef: IDENTIFIER ('=' expression)? ;
 valueDefine: type valueDef (',' valueDef)* ';';
 valueList: expression (',' expression)*;
-newType: baseType '('')' | baseType ('['expression?']')*;
+newType
+    : baseType ('('')')?                                                        #objectInitial
+    | baseType ('['expression']')+('['']')*                                     #arrayInitial
+    | baseType ('['expression']')+('['']')+'['expression']'('['expression?']')* #wrongInitial
+;
 
 returnType: type | VOID;
 functionParameter: (type IDENTIFIER (',' type IDENTIFIER)*)?;
 functionDefine: returnType IDENTIFIER '(' functionParameter ')' suite;
-lambdaFunction: '[''&'']'('('functionParameter')')? '->' '{' statement '}' '('valueList')';
-functionCall: IDENTIFIER'('valueList?')';
+lambdaFunction: '[''&'']'('('functionParameter')')? '->' suite '('valueList')';
 
 classConstructor: IDENTIFIER '('')' suite;
 classDefine: CLASS IDENTIFIER '{' (valueDefine | classConstructor | functionDefine)* '}'';';
-classAccess: IDENTIFIER '.' IDENTIFIER('('valueList?')')? | THIS;
 
 suite: '{' statement* '}';
 
@@ -40,22 +42,24 @@ statement
 
 expression
     : primary                                               #atomExpr
-    | expression '[' expression ']'                         #indexExpr
-    | expression op = ('*'|'/'|'%') expression              #binaryExpr
-    | expression op = ('<<'|'>>') expression                #binaryExpr
-    | expression op = ('<'|'<='|'>'|'>=') expression        #binaryExpr
-    | expression op = ('=='|'!=') expression                #binaryExpr
-    | expression op = ('&'|'|'|'^') expression              #binaryExpr
-    | expression op = ('&&'|'||') expression                #binaryExpr
+    | name=expression '[' index=expression ']'              #indexExpr
+    | left=expression op = ('*'|'/'|'%') right=expression   #binaryExpr
+    | left=expression op = ('<<'|'>>') right=expression     #binaryExpr
+    | left=expression op = ('<'|'<=') right=expression      #binaryExpr
+    | left=expression op = ('>'|'>=') right=expression      #binaryExpr
+    | left=expression op = ('=='|'!=') right=expression     #binaryExpr
+    | left=expression op = ('&'|'|'|'^') right=expression   #binaryExpr
+    | left=expression op = ('&&'|'||') right=expression     #binaryExpr
+    | left=expression op = ('+'|'-') right=expression       #binaryExpr
     | expression op=('++'|'--')                             #incrExpr
-    | expression op = ('+'|'-') expression                  #binaryExpr
     | <assoc=right> op = ('~'|'!'|'-'|'+') expression       #unaryExpr
     | <assoc=right> op=('++'|'--') expression               #unaryExpr
-    | <assoc=right> expression '=' expression               #assignExpr
+    | <assoc=right> left=expression '=' right=expression    #assignExpr
     | <assoc=right> NEW newType                             #newExpr
-    | functionCall                                          #funtionExpr
+    | IDENTIFIER'('valueList?')'                            #functionExpr
     | lambdaFunction                                        #lambdaExpr
-    | classAccess                                           #classExpr
+    | id=IDENTIFIER '.' func=IDENTIFIER('('valueList?')')?  #classExpr
+    | THIS                                                  #classExpr
 
 ;
 

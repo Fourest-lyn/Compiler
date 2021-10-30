@@ -5,9 +5,9 @@ import Util.Position;
 
 public class IdExpression extends Expression
 {
-    public Expression identifier;
+    public String identifier;
 
-    public IdExpression(Position pos,Expression identifier)
+    public IdExpression(Position pos,String identifier)
     {
         super(pos);
         this.identifier=identifier;

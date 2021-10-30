@@ -1,6 +1,7 @@
 package AST.ExprNode;
 
 import AST.ASTVisitor;
+import AST.ToolNode.ValueList;
 import Util.Position;
 
 import java.util.ArrayList;
@@ -8,9 +9,9 @@ import java.util.ArrayList;
 public class FuncExpression extends Expression
 {
     public Expression funcName;
-    public ArrayList<Expression> values;
+    public ValueList values;
 
-    public FuncExpression(Position pos,Expression funcName,ArrayList<Expression> values)
+    public FuncExpression(Position pos,Expression funcName,ValueList values)
     {
         super(pos);
         this.funcName=funcName;

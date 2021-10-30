@@ -1,15 +1,24 @@
 package AST.ExprNode;
 
 import AST.ASTVisitor;
+import AST.ToolNode.ValueList;
 import Util.Position;
 
 public class ClassExpression extends Expression
 {
-    public ClassExpression(Position pos)
+    public String className;
+    public String methodName;
+    public boolean functionFlag;
+    public ValueList values;
+
+    public ClassExpression(Position pos,String className,String methodName,ValueList values,boolean functionFlag)
     {
         super(pos);
+        this.className=className;
+        this.methodName=methodName;
+        this.functionFlag=functionFlag;
+        this.values=values;
     }
 
-    @Override
-    public void accept(ASTVisitor visitor) {visitor.visit(this);}
+    @Override public void accept(ASTVisitor visitor) {visitor.visit(this);}
 }

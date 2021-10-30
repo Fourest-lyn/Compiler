@@ -9,10 +9,10 @@ public class BlockStatement extends Statement
 {
     public ArrayList<Statement> stmts;
 
-    public BlockStatement(Position pos)
+    public BlockStatement(Position pos,ArrayList<Statement> stmts)
     {
         super(pos);
-        this.stmts=new ArrayList<>();
+        this.stmts=stmts;
     }
 
     @Override

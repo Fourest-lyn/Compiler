@@ -6,7 +6,7 @@ import Util.Position;
 
 import java.util.ArrayList;
 
-public class ClassDefine extends ASTNode
+public class ClassDefine extends Define
 {
     public String className;
     public ArrayList<ValueDefine> valueDefs;

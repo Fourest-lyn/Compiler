@@ -28,6 +28,18 @@ public class MxBaseListener implements MxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterProgramBlock(MxParser.ProgramBlockContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitProgramBlock(MxParser.ProgramBlockContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterBaseType(MxParser.BaseTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -88,13 +100,37 @@ public class MxBaseListener implements MxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNewType(MxParser.NewTypeContext ctx) { }
+	@Override public void enterObjectInitial(MxParser.ObjectInitialContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNewType(MxParser.NewTypeContext ctx) { }
+	@Override public void exitObjectInitial(MxParser.ObjectInitialContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterArrayInitial(MxParser.ArrayInitialContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitArrayInitial(MxParser.ArrayInitialContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterWrongInitial(MxParser.WrongInitialContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitWrongInitial(MxParser.WrongInitialContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -136,25 +172,13 @@ public class MxBaseListener implements MxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLambdafunction(MxParser.LambdafunctionContext ctx) { }
+	@Override public void enterLambdaFunction(MxParser.LambdaFunctionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLambdafunction(MxParser.LambdafunctionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterFunctionCall(MxParser.FunctionCallContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitFunctionCall(MxParser.FunctionCallContext ctx) { }
+	@Override public void exitLambdaFunction(MxParser.LambdaFunctionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -179,18 +203,6 @@ public class MxBaseListener implements MxListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitClassDefine(MxParser.ClassDefineContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterClassAccess(MxParser.ClassAccessContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitClassAccess(MxParser.ClassAccessContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -352,13 +364,25 @@ public class MxBaseListener implements MxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSingleExpr(MxParser.SingleExprContext ctx) { }
+	@Override public void enterUnaryExpr(MxParser.UnaryExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSingleExpr(MxParser.SingleExprContext ctx) { }
+	@Override public void exitUnaryExpr(MxParser.UnaryExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLambdaExpr(MxParser.LambdaExprContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLambdaExpr(MxParser.LambdaExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -388,18 +412,6 @@ public class MxBaseListener implements MxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIncrExpr(MxParser.IncrExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitIncrExpr(MxParser.IncrExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterBinaryExpr(MxParser.BinaryExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -412,25 +424,13 @@ public class MxBaseListener implements MxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCalcExpr(MxParser.CalcExprContext ctx) { }
+	@Override public void enterIncrExpr(MxParser.IncrExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCalcExpr(MxParser.CalcExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterDigitExpr(MxParser.DigitExprContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitDigitExpr(MxParser.DigitExprContext ctx) { }
+	@Override public void exitIncrExpr(MxParser.IncrExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -448,13 +448,13 @@ public class MxBaseListener implements MxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFuntionExpr(MxParser.FuntionExprContext ctx) { }
+	@Override public void enterFunctionExpr(MxParser.FunctionExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFuntionExpr(MxParser.FuntionExprContext ctx) { }
+	@Override public void exitFunctionExpr(MxParser.FunctionExprContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
