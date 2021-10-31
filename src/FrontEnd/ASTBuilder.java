@@ -93,7 +93,8 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
         BaseType baseType=(BaseType) visit(ctx.baseType());
         ArrayList<Expression> expressions=new ArrayList<>();
         for(var it: ctx.expression()) expressions.add((Expression) visit(it));
-        return new ArrayInitial(new Position(ctx),baseType,expressions);
+        int dimension=ctx.LEFTBRACKET().size();
+        return new ArrayInitial(new Position(ctx),baseType,dimension,expressions);
     }
 
     @Override public ASTNode visitWrongInitial(MxParser.WrongInitialContext ctx)

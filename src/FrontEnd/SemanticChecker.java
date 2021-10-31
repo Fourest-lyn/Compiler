@@ -1,5 +1,6 @@
 package FrontEnd;
 
+import AST.ASTNode;
 import AST.ASTVisitor;
 import AST.DefineNode.*;
 import AST.ExprNode.*;
@@ -23,7 +24,24 @@ public class SemanticChecker implements ASTVisitor
     /** Program */
     @Override public void visit(ProgramNode node)
     {
-        //todo
+        currentScope=globalScope;
+        boolean mainFlag=false;
+        int mainNum=-1;
+        for(int i=0;i<node.defines.size();++i)
+        {
+            var it=node.defines.get(i);
+            if(it instanceof FunctionDefine)
+            {
+                if(((FunctionDefine) it).funcName.equals("main") && ((FunctionDefine) it).returnType.typeName().equals("int"))
+                {
+                    mainFlag=true;
+                    mainNum=i;
+                }
+            }
+            else it.accept(this);
+        }
+        if(!mainFlag) throw new SemanticError(node.pos,"Without function <int main()>.");
+        node.defines.get(mainNum).accept(this);
     }
 
     /** Statements */
@@ -61,12 +79,16 @@ public class SemanticChecker implements ASTVisitor
             {
                 if(!stmt.expr.type.typeName().equals(currentScope.functionType.typeName()))
                     throw new SemanticError(stmt.pos,"Unmatched return type.");
-                //todo: to check the array dimension.
+            }
+            else
+            {
+                if(currentScope.functionType.typeName().equals("int") || currentScope.functionType.typeName().equals("bool"))
+                    throw new SemanticError(stmt.pos,"Null could not assign to <int> & <bool>.");
             }
         }
         else
         {
-            if(currentScope.functionType!=null && !currentScope.functionType.typeName().equals("void"))
+            if(currentScope.functionType!=null && !(currentScope.functionType instanceof VoidType))
                 throw new SemanticError(stmt.pos,"Expect return value.");
         }
     }
@@ -176,9 +198,9 @@ public class SemanticChecker implements ASTVisitor
     {
         expr.leftExpr.accept(this);
         expr.rightExpr.accept(this);
+
         String leftType=expr.leftExpr.type.typeName();
         String rightType=expr.rightExpr.type.typeName();
-
         if(!expr.leftExpr.leftFlag)
             throw new SemanticError(expr.leftExpr.pos,"Except a lvalue but not.");
 
@@ -191,9 +213,7 @@ public class SemanticChecker implements ASTVisitor
             }
             else throw new SemanticError(expr.pos,"Except same type on both side.");
         }
-
-        //todo: Process conditions about array.
-
+        expr.type=expr.rightExpr.type;
     }
 
     @Override public void visit(NewExpression expr)
@@ -243,9 +263,13 @@ public class SemanticChecker implements ASTVisitor
 
     @Override public void visit(IndexExpression expr)
     {
-        //todo
+        expr.index.accept(this);
+        if(!expr.index.type.typeName().equals("int"))
+            throw new SemanticError(expr.index.pos,"Expect type <int> but <"+expr.index.type.typeName()+">.");
 
-
+        expr.name.accept(this);
+        if(expr.name instanceof IdExpression) expr.type=expr.name.type;
+        else expr.type=new ArrayType(expr.pos,expr.name.type);
 
     }
 
@@ -344,6 +368,7 @@ public class SemanticChecker implements ASTVisitor
 
         currentScope=new Scope(currentScope);
         currentScope.functionFlag=true;
+
         currentScope.putParameters(def.paras);
         def.suite.accept(this);
         def.functionScope=currentScope;
@@ -382,15 +407,22 @@ public class SemanticChecker implements ASTVisitor
 
     @Override public void visit(SingleDefine def)
     {
-        //todo
         if(currentScope.containsVariable(def.name,false))
             throw new SemanticError(def.pos,"Variable name already exists.");
 
         if(def.expr!=null)
         {
             def.expr.accept(this);
-            if(!def.type.typeName().equals(def.expr.type.typeName()))
-                throw new SemanticError(def.expr.pos,"Incorrect Type of expression.");
+            if(def.expr.nullFlag)
+            {
+                if(def.type.typeName().equals("int") || def.type.typeName().equals("bool"))
+                    throw new SemanticError(def.expr.pos,"Null could not assign to <int> & <bool>.");
+            }
+            else
+            {
+                if(!def.type.typeName().equals(def.expr.type.typeName()))
+                    throw new SemanticError(def.expr.pos,"Incorrect Type of expression.");
+            }
         }
     }
 
@@ -460,8 +492,11 @@ public class SemanticChecker implements ASTVisitor
             if(!it.type.typeName().equals("int"))
                 throw new SemanticError(it.pos,"Expect type <int> but <"+it.type.typeName()+">.");
         }
-        tool.type=new ArrayType(tool.pos,tool.baseType);
-        //todo: process arrayType;
+        Type type=new BaseType(tool.pos,tool.baseType.typeName());
+        for(int i=0;i<tool.dimension;++i) type=new ArrayType(tool.pos,type);
+
+        tool.type=type;
+
     }
 
     @Override public void visit(WrongInitial tool) {}

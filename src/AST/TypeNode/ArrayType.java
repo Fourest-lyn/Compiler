@@ -23,12 +23,5 @@ public class ArrayType extends Type
         }
     }
 
-    public ArrayType(Position pos,BaseType baseType,int dimension)
-    {
-        super(pos, baseType.typeName());
-        this.baseType=baseType;
-        this.dimension=dimension;
-    }
-
     @Override public void accept(ASTVisitor visitor) {visitor.visit(this);}
 }
