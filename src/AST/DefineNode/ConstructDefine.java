@@ -4,6 +4,7 @@ import AST.ASTNode;
 import AST.ASTVisitor;
 import AST.StmtNode.BlockStatement;
 import Util.Position;
+import Util.Scope.Scope;
 
 public class ConstructDefine extends Define
 {

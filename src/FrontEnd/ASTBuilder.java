@@ -66,8 +66,14 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
     @Override public ASTNode visitValueDefine(MxParser.ValueDefineContext ctx)
     {
         ArrayList<SingleDefine> defines=new ArrayList<>();
-        for(var it:ctx.valueDef()) defines.add((SingleDefine) visit(it));
-        return new ValueDefine(new Position(ctx), (Type) visit(ctx.type()),defines);
+        Type type=(Type) visit(ctx.type());
+        for(var it:ctx.valueDef())
+        {
+            SingleDefine def=(SingleDefine) visit(it);
+            def.type=type;
+            defines.add(def);
+        }
+        return new ValueDefine(new Position(ctx),type,defines);
     }
 
     @Override public ASTNode visitValueList(MxParser.ValueListContext ctx)
@@ -84,9 +90,10 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
 
     @Override public ASTNode visitArrayInitial(MxParser.ArrayInitialContext ctx)
     {
-        int dimension=ctx.expression().size();
         BaseType baseType=(BaseType) visit(ctx.baseType());
-        return new ArrayInitial(new Position(ctx),baseType,dimension);
+        ArrayList<Expression> expressions=new ArrayList<>();
+        for(var it: ctx.expression()) expressions.add((Expression) visit(it));
+        return new ArrayInitial(new Position(ctx),baseType,expressions);
     }
 
     @Override public ASTNode visitWrongInitial(MxParser.WrongInitialContext ctx)
@@ -261,6 +268,15 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
         return (Expression)visit(ctx.primary());
     }
 
+    @Override public ASTNode visitIncrExpr(MxParser.IncrExprContext ctx)
+    {
+        Expression leftExpr=(Expression) visit(ctx.expression());
+        IncrExpression.Operator op=null;
+        if(ctx.SELFPLUS()!=null) op= IncrExpression.Operator.SELFINC;
+        if(ctx.SELFMINUS()!=null) op= IncrExpression.Operator.SELFDEC;
+        return new IncrExpression(new Position(ctx),op,leftExpr);
+    }
+
     @Override public ASTNode visitBinaryExpr(MxParser.BinaryExprContext ctx)
     {
         Expression left= (Expression) visit(ctx.left);
@@ -296,7 +312,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
     {
         String funcName=ctx.IDENTIFIER().getText();
         ValueList values= (ValueList) visit(ctx.valueList());
-        return super.visitFunctionExpr(ctx);
+        return new FuncExpression(new Position(ctx),funcName,values);
     }
 
     @Override public ASTNode visitPrimary(MxParser.PrimaryContext ctx)

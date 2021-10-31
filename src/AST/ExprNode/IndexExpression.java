@@ -13,6 +13,5 @@ public class IndexExpression extends Expression
         this.index=index;
     }
 
-    @Override
-    public void accept(ASTVisitor visitor) {visitor.visit(this);}
+    @Override public void accept(ASTVisitor visitor) {visitor.visit(this);}
 }

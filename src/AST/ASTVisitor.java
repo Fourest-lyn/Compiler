@@ -33,6 +33,7 @@ public interface ASTVisitor
     public void visit(UnaryExpression   expr);
     public void visit(LambdaExpression  expr);
     public void visit(ThisExpression    expr);
+    public void visit(IncrExpression    expr);
 
     public void visit(ValueDefine       def);
     public void visit(FunctionDefine    def);

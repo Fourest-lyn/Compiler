@@ -4,17 +4,18 @@ import AST.ASTNode;
 import AST.ASTVisitor;
 import AST.ExprNode.Expression;
 import AST.TypeNode.BaseType;
+import AST.TypeNode.Type;
 import Util.Position;
 
 import java.util.ArrayList;
 
 abstract public class NewType extends ASTNode
 {
-    public BaseType baseType;
+    public Type type;
 
-    public NewType(Position pos,BaseType baseType)
+    public NewType(Position pos,Type type)
     {
         super(pos);
-        this.baseType=baseType;
+        this.type=type;
     }
 }

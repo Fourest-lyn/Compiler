@@ -1,6 +1,8 @@
 package Util.Scope;
 
 import AST.DefineNode.FunctionDefine;
+import AST.DefineNode.ValueDefine;
+import AST.ToolNode.FunctionParameter;
 import AST.TypeNode.Type;
 import Util.Error.SemanticError;
 import Util.Position;
@@ -12,8 +14,8 @@ import java.util.Map;
 public class Scope
 {
     private Scope parentScope;
-    public Map<String,FunctionDefine> functions;
-    public Map<String, Type> variables;
+    private Map<String,FunctionDefine> functions;
+    private Map<String, Type> variables;
     public boolean classFlag=false,functionFlag=false;
     public Type classType=null;
     public Type functionType=null;
@@ -55,6 +57,26 @@ public class Scope
         return false;
     }
 
+    public void putParameters(FunctionParameter paras)
+    {
+        for(int i=0;i<paras.names.size();++i)
+            variables.put(paras.names.get(i),paras.types.get(i));
+    }
 
+    public void putVariable(Type type,String name) {variables.put(name,type);}
 
+    public void putVariables(ValueDefine def)
+    {
+        for(var it: def.valueDefs)
+            variables.put(it.name,it.type);
+    }
+
+    public void putFunction(FunctionDefine def) {functions.put(def.funcName,def);}
+
+    public FunctionDefine getFunction(String funcName,boolean upperCheckFlag)
+    {
+        if(functions.containsKey(funcName)) return functions.get(funcName);
+        if(upperCheckFlag && parentScope!=null) return parentScope.getFunction(funcName,true);
+        return null;
+    }
 }

@@ -6,6 +6,7 @@ import AST.StmtNode.BlockStatement;
 import AST.ToolNode.FunctionParameter;
 import AST.TypeNode.Type;
 import Util.Position;
+import Util.Scope.Scope;
 
 public class FunctionDefine extends Define
 {
@@ -13,6 +14,7 @@ public class FunctionDefine extends Define
     public String funcName;
     public FunctionParameter paras;
     public BlockStatement suite;
+    public Scope functionScope;
 
 
     public FunctionDefine(Position pos,Type returnType,String funcName,FunctionParameter paras,BlockStatement suite)

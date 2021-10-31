@@ -3,6 +3,7 @@ package AST.DefineNode;
 import AST.ASTNode;
 import AST.ASTVisitor;
 import Util.Position;
+import Util.Scope.Scope;
 
 import java.util.ArrayList;
 
@@ -12,6 +13,7 @@ public class ClassDefine extends Define
     public ArrayList<ValueDefine> valueDefs;
     public ArrayList<ConstructDefine> consDefs;
     public ArrayList<FunctionDefine> funcDefs;
+    public Scope classScope;
 
     public ClassDefine(Position pos,String className,ArrayList<ValueDefine> valueDefs,ArrayList<ConstructDefine> consDefs,ArrayList<FunctionDefine> funcDefs)
     {

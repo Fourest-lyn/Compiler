@@ -8,6 +8,7 @@ import AST.StmtNode.*;
 import AST.ToolNode.*;
 import AST.TypeNode.ArrayType;
 import AST.TypeNode.BaseType;
+import AST.TypeNode.Type;
 import AST.TypeNode.VoidType;
 import Util.Error.SemanticError;
 import Util.Position;
@@ -173,48 +174,136 @@ public class SemanticChecker implements ASTVisitor
 
     @Override public void visit(AssignExpression expr)
     {
-        //todo
+        expr.leftExpr.accept(this);
+        expr.rightExpr.accept(this);
+        String leftType=expr.leftExpr.type.typeName();
+        String rightType=expr.rightExpr.type.typeName();
+
+        if(!expr.leftExpr.leftFlag)
+            throw new SemanticError(expr.leftExpr.pos,"Except a lvalue but not.");
+
+        if(!leftType.equals(rightType))
+        {
+            if(rightType.equals("null"))
+            {
+                if(leftType.equals("int") || leftType.equals("bool"))
+                    throw new SemanticError(expr.rightExpr.pos,"The type <int> & <bool> should not be null.");
+            }
+            else throw new SemanticError(expr.pos,"Except same type on both side.");
+        }
+
+        //todo: Process conditions about array.
+
     }
 
     @Override public void visit(NewExpression expr)
     {
-        //todo
+        expr.newType.accept(this);
+        expr.type=expr.newType.type;
     }
 
-    @Override public void visit(ConstExpression expr)
-    {
-        //todo:
-    }
+    @Override public void visit(ConstExpression expr) {expr.type=new BaseType(expr.pos,expr.kind);}
 
     @Override public void visit(IdExpression expr)
     {
-        //todo
+        if(!currentScope.containsVariable(expr.identifier,true))
+            throw new SemanticError(expr.pos,"Undefined variable here.");
+        expr.type= currentScope.getVariable(expr.identifier,true);
     }
 
     @Override public void visit(ClassExpression expr)
     {
-        //todo
+        String objectName=expr.objectName;
+        if(!currentScope.containsVariable(objectName,true))
+            throw new SemanticError(expr.pos,"Undefined variable here.");
+        Type objectType=currentScope.getVariable(objectName,true);
+        if(!globalScope.checkType(objectType.typeName()))
+            throw new SemanticError(expr.pos,"Undefined type here.");// Just for insurance.
+        ClassDefine classDefine=globalScope.getClass(objectType.typeName());
+
+        String methodName=expr.methodName;
+        if(expr.functionFlag)
+        {
+            if(!classDefine.classScope.containsFunction(methodName,false))
+                throw new SemanticError(expr.pos,"Undefined method/function here.");
+            FunctionDefine function=classDefine.classScope.getFunction(methodName,false);
+            expr.values.accept(this);
+            if(expr.values.expressions.size()!=function.paras.names.size())
+                throw new SemanticError(expr.values.pos,"Incorrect number of parameters.");
+            expr.type=function.returnType;
+        }
+        else
+        {
+            if(!classDefine.classScope.containsVariable(methodName,false))
+                throw new SemanticError(expr.pos,"Undefined variable here.");
+            expr.type= classDefine.classScope.getVariable(methodName,false);
+        }
+
     }
 
     @Override public void visit(IndexExpression expr)
     {
         //todo
+
+
+
     }
 
     @Override public void visit(FuncExpression expr)
     {
-        //todo
+        if(!currentScope.containsFunction(expr.funcName,true))
+            throw new SemanticError(expr.pos,"Nonexistent function <"+expr.funcName+">.");
+        FunctionDefine function=currentScope.getFunction(expr.funcName,true);
+        if(expr.values!=null)
+        {
+            if(function.paras==null)
+                 throw new SemanticError(expr.pos,"Incorrect number of parameters.");
+            expr.values.accept(this);
+            if(expr.values.expressions.size()!=function.paras.names.size())
+                throw new SemanticError(expr.values.pos,"Incorrect number of parameters.");
+        }
+        else
+        {
+            if(function.paras!=null)
+                throw new SemanticError(expr.pos,"Incorrect number of parameters.");
+        }
+        expr.type=function.returnType;
     }
 
     @Override public void visit(UnaryExpression expr)
     {
-        //todo
+        expr.rightExpr.accept(this);
+        String typeName=expr.rightExpr.type.typeName();
+        Position pos=expr.rightExpr.pos;
+
+        switch (expr.op)
+        {
+            case SELFDEC,SELFINC ->
+            {
+                if(!typeName.equals("int"))
+                    throw new SemanticError(pos,"Except type <int> but <"+typeName+">.");
+                if(!expr.rightExpr.leftFlag)
+                    throw new SemanticError(pos,"Except lvalue here.");
+                expr.leftFlag=true;
+                expr.type=new BaseType(pos,"int");
+            }
+            case NEG,POS,BITNOT ->
+            {
+                if(!typeName.equals("int"))
+                    throw new SemanticError(pos,"Except type <int> but <"+typeName+">.");
+                expr.type=new BaseType(pos,"int");
+            }
+            case LNOT ->
+            {
+                if(!typeName.equals("bool"))
+                    throw new SemanticError(pos,"Except type <bool> but <"+typeName+">.");
+                expr.type=new BaseType(pos,"bool");
+            }
+        }
+
     }
 
-    @Override public void visit(LambdaExpression expr)
-    {
-        //todo
-    }
+    @Override public void visit(LambdaExpression expr) {expr.lambda.accept(this);}
 
     @Override public void visit(ThisExpression expr)
     {
@@ -226,69 +315,153 @@ public class SemanticChecker implements ASTVisitor
         else throw new SemanticError(expr.pos,"Unexpected appearance of <this>.");
     }
 
+    @Override public void visit(IncrExpression expr)
+    {
+        expr.leftExpr.accept(this);
+        if(!expr.leftExpr.type.typeName().equals("int"))
+            throw new SemanticError(expr.leftExpr.pos,"Except type <int> but <"+expr.leftExpr.type.typeName()+">.");
+        if(!expr.leftExpr.leftFlag)
+            throw new SemanticError(expr.leftExpr.pos,"Except lvalue here.");
+        expr.type=new BaseType(expr.pos,"int");
+    }
+
     /** Define */
     @Override public void visit(ValueDefine def)
     {
-        //todo
+        def.type.accept(this);
+        for(var it: def.valueDefs) it.accept(this);
     }
 
     @Override public void visit(FunctionDefine def)
     {
-        //todo
+        def.returnType.accept(this);
+        currentScope.functionType=def.returnType;
+
+        if(globalScope.checkFuncName(def.funcName))
+            throw new SemanticError(def.pos,"Function name already exists.");
+
+        def.paras.accept(this);
+
+        currentScope=new Scope(currentScope);
+        currentScope.functionFlag=true;
+        currentScope.putParameters(def.paras);
+        def.suite.accept(this);
+        def.functionScope=currentScope;
+        currentScope=currentScope.parentScope();
+        currentScope.putFunction(def);
     }
 
     @Override public void visit(ClassDefine def)
     {
-        //todo
+        if(globalScope.checkType(def.className))
+            throw new SemanticError(def.pos,"Class name already exists.");
+
+        currentScope=new Scope(currentScope);
+        currentScope.classFlag=true;
+        currentScope.classType=new BaseType(def.pos,def.className);
+
+        for(var it: def.valueDefs) it.accept(this);
+        for(var it: def.funcDefs) it.accept(this);
+        for(var it: def.consDefs) it.accept(this);
+
+        def.classScope=currentScope;
+        currentScope=currentScope.parentScope();
     }
 
     @Override public void visit(ConstructDefine def)
     {
-        //todo
+        if(!currentScope.classFlag)
+            throw new SemanticError(def.pos,"Constructor not in class.");
+        if(!def.name.equals(currentScope.classType.typeName()))
+            throw new SemanticError(def.pos,"Unexpected Constructor name.");
+
+        currentScope=new Scope(currentScope);
+        def.suite.accept(this);
+        currentScope=currentScope.parentScope();
     }
 
     @Override public void visit(SingleDefine def)
     {
         //todo
+        if(currentScope.containsVariable(def.name,false))
+            throw new SemanticError(def.pos,"Variable name already exists.");
+
+        if(def.expr!=null)
+        {
+            def.expr.accept(this);
+            if(!def.type.typeName().equals(def.expr.type.typeName()))
+                throw new SemanticError(def.expr.pos,"Incorrect Type of expression.");
+        }
     }
 
     /** Type */
     @Override public void visit(BaseType type)
     {
-        //todo
+        if(!globalScope.checkType(type.typeName()))
+            throw new SemanticError(type.pos,"Undefined type used.");
     }
 
-    @Override public void visit(ArrayType type)
-    {
-        //todo
-    }
+    @Override public void visit(ArrayType type) {type.baseType.accept(this);}
 
     @Override public void visit(VoidType type) {}
 
     /** Tool */
     @Override public void visit(ValueList tool)
     {
-        //todo
+        for(var it: tool.expressions)
+            it.accept(this);
     }
 
-    @Override public void visit(ObjectInitial tool)
-    {
-        //todo
-    }
+    @Override public void visit(ObjectInitial tool) {tool.type.accept(this);}
 
     @Override public void visit(FunctionParameter tool)
     {
-        //todo
+        if(tool.names!=null || tool.types!=null)
+        {
+            if(tool.types==null || tool.names==null)
+                throw new SemanticError(tool.pos, "Expect same number of identifier and type.");
+            if(tool.types.size()!=tool.names.size())
+                throw new SemanticError(tool.pos,"Expect same number of identifier and type.");
+            for(var it: tool.types) it.accept(this);
+        }
     }
 
     @Override public void visit(LambdaFunction tool)
     {
-        //todo
+        if(tool.valuelist==null && tool.paras==null)
+        {
+            currentScope=new Scope(currentScope);
+            currentScope.functionFlag=true;
+            tool.suite.accept(this);
+            currentScope=currentScope.parentScope();
+            return;
+        }
+
+        if(tool.valuelist==null || tool.paras==null)
+            throw new SemanticError(tool.pos,"Incorrect number of parameters.");
+        tool.valuelist.accept(this);
+        tool.paras.accept(this);
+
+        if(tool.valuelist.expressions.size()!=tool.paras.names.size())
+            throw new SemanticError(tool.valuelist.pos,"Incorrect number of parameters.");
+        currentScope=new Scope(currentScope);
+        currentScope.putParameters(tool.paras);
+        currentScope.functionFlag=true;
+        tool.suite.accept(this);
+        currentScope=currentScope.parentScope();
     }
 
     @Override public void visit(ArrayInitial tool)
     {
-        //todo
+        tool.baseType.accept(this);
+        for(var it: tool.expressions)
+        {
+            it.accept(this);
+            if(!it.type.typeName().equals("int"))
+                throw new SemanticError(it.pos,"Expect type <int> but <"+it.type.typeName()+">.");
+        }
+        tool.type=new ArrayType(tool.pos,tool.baseType);
+        //todo: process arrayType;
     }
 
     @Override public void visit(WrongInitial tool) {}

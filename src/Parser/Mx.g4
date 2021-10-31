@@ -51,9 +51,9 @@ expression
     | left=expression op = ('&'|'|'|'^') right=expression   #binaryExpr
     | left=expression op = ('&&'|'||') right=expression     #binaryExpr
     | left=expression op = ('+'|'-') right=expression       #binaryExpr
-    | expression op=('++'|'--')                             #unaryExpr
+    | expression op = ('++'|'--')                           #incrExpr
     | <assoc=right> op = ('~'|'!'|'-'|'+') expression       #unaryExpr
-    | <assoc=right> op=('++'|'--') expression               #unaryExpr
+    | <assoc=right> op = ('++'|'--') expression             #unaryExpr
     | <assoc=right> left=expression '=' right=expression    #assignExpr
     | <assoc=right> NEW newType                             #newExpr
     | IDENTIFIER'('valueList?')'                            #functionExpr
