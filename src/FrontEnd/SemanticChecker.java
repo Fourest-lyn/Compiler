@@ -21,10 +21,16 @@ public class SemanticChecker implements ASTVisitor
     private Scope currentScope;
     public GlobalScope globalScope;
 
+    public SemanticChecker(GlobalScope globalScope)
+    {
+        this.globalScope=globalScope;
+        currentScope=globalScope;
+    }
+
+
     /** Program */
     @Override public void visit(ProgramNode node)
     {
-        currentScope=globalScope;
         boolean mainFlag=false;
         int mainNum=-1;
         for(int i=0;i<node.defines.size();++i)

@@ -22,13 +22,6 @@ import java.util.ArrayList;
 
 public class ASTBuilder extends MxBaseVisitor<ASTNode>
 {
-    public GlobalScope globalScope;
-    public Scope currentScope;
-
-    public ASTBuilder(GlobalScope scope)
-    {
-        this.globalScope=scope;
-    }
 
     @Override public ASTNode visitProgram(MxParser.ProgramContext ctx)
     {
@@ -323,8 +316,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
         return (Expression)visit(ctx.expression());
     }
 
-    @Override
-    public ASTNode visitLiteral(MxParser.LiteralContext ctx)
+    @Override public ASTNode visitLiteral(MxParser.LiteralContext ctx)
     {
         String kind=null;
         if(ctx.BOOLCONST()!=null) kind= "bool";
