@@ -21,6 +21,7 @@ public interface ASTVisitor
     public void visit(ExprStatement     stmt);
     public void visit(BlockStatement    stmt);
     public void visit(EmptyStatement    stmt);
+    public void visit(ValueDefStatement stmt);
 
     public void visit(BinaryExpression  expr);
     public void visit(AssignExpression  expr);

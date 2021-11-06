@@ -6,12 +6,12 @@ import Util.Position;
 
 public class ClassExpression extends Expression
 {
-    public String objectName;
+    public Expression objectName;
     public String methodName;
     public boolean functionFlag;
     public ValueList values;
 
-    public ClassExpression(Position pos,String objectName,String methodName,ValueList values,boolean functionFlag)
+    public ClassExpression(Position pos,Expression objectName,String methodName,ValueList values,boolean functionFlag)
     {
         super(pos);
         this.objectName =objectName;

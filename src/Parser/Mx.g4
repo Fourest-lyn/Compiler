@@ -16,9 +16,9 @@ newType
 ;
 
 returnType: type | VOID;
-functionParameter: (type IDENTIFIER (',' type IDENTIFIER)*)?;
-functionDefine: returnType IDENTIFIER '(' functionParameter ')' suite;
-lambdaFunction: '[''&'']'('('functionParameter')')? '->' suite '('valueList')';
+functionParameter: type IDENTIFIER (',' type IDENTIFIER)*;
+functionDefine: returnType IDENTIFIER '(' functionParameter? ')' suite;
+lambdaFunction: '[''&'']'('('functionParameter?')')? '->' suite '('valueList')';
 
 classConstructor: IDENTIFIER '('')' suite;
 classDefine: CLASS IDENTIFIER '{' (valueDefine | classConstructor | functionDefine)* '}'';';
@@ -42,6 +42,7 @@ statement
 
 expression
     : primary                                               #atomExpr
+    | NEW newType                                           #newExpr
     | name=expression '[' index=expression ']'              #indexExpr
     | left=expression op = ('*'|'/'|'%') right=expression   #binaryExpr
     | left=expression op = ('<<'|'>>') right=expression     #binaryExpr
@@ -55,10 +56,9 @@ expression
     | <assoc=right> op = ('~'|'!'|'-'|'+') expression       #unaryExpr
     | <assoc=right> op = ('++'|'--') expression             #unaryExpr
     | <assoc=right> left=expression '=' right=expression    #assignExpr
-    | <assoc=right> NEW newType                             #newExpr
     | IDENTIFIER'('valueList?')'                            #functionExpr
     | lambdaFunction                                        #lambdaExpr
-    | id=IDENTIFIER '.' func=IDENTIFIER('('valueList?')')?  #classExpr
+    | id=expression '.' func=IDENTIFIER('('valueList?')')?  #classExpr
     | THIS                                                  #classExpr
 
 ;

@@ -11,6 +11,7 @@ public class IdExpression extends Expression
     {
         super(pos);
         this.identifier=identifier;
+        this.leftFlag=true;
     }
 
     @Override

@@ -11,6 +11,7 @@ import AST.TypeNode.ArrayType;
 import AST.TypeNode.BaseType;
 import AST.TypeNode.Type;
 import AST.TypeNode.VoidType;
+import Util.Debug;
 import Util.Error.SemanticError;
 import Util.Position;
 import Util.Scope.GlobalScope;
@@ -20,6 +21,7 @@ public class SemanticChecker implements ASTVisitor
 {
     private Scope currentScope;
     public GlobalScope globalScope;
+    private Debug debug=new Debug();
 
     public SemanticChecker(GlobalScope globalScope)
     {
@@ -38,15 +40,19 @@ public class SemanticChecker implements ASTVisitor
             var it=node.defines.get(i);
             if(it instanceof FunctionDefine)
             {
-                if(((FunctionDefine) it).funcName.equals("main") && ((FunctionDefine) it).returnType.typeName().equals("int"))
+                if(((FunctionDefine) it).funcName.equals("main"))
                 {
-                    mainFlag=true;
-                    mainNum=i;
+                    if(((FunctionDefine) it).returnType.typeName().equals("int"))
+                    {
+                        mainFlag = true;
+                        mainNum = i;
+                    }
                 }
+                else it.accept(this);
             }
             else it.accept(this);
         }
-        if(!mainFlag) throw new SemanticError(node.pos,"Without function <int main()>.");
+        if(!mainFlag) throw new SemanticError(node.pos,"Without function <int main()>");
         node.defines.get(mainNum).accept(this);
     }
 
@@ -154,9 +160,12 @@ public class SemanticChecker implements ASTVisitor
 
     @Override public void visit(EmptyStatement stmt) {}
 
+    @Override public void visit(ValueDefStatement stmt) {stmt.valueDefine.accept(this);}
+
     /** Expression */
     @Override public void visit(BinaryExpression expr)
     {
+        debug.print("Visit here, BinaryExpression.");
         expr.leftExpr.accept(this);
         expr.rightExpr.accept(this);
         String leftType=expr.leftExpr.type.typeName();
@@ -202,6 +211,7 @@ public class SemanticChecker implements ASTVisitor
 
     @Override public void visit(AssignExpression expr)
     {
+        debug.module("AssignExpression");
         expr.leftExpr.accept(this);
         expr.rightExpr.accept(this);
 
@@ -224,6 +234,7 @@ public class SemanticChecker implements ASTVisitor
 
     @Override public void visit(NewExpression expr)
     {
+        debug.module("NewExpression");
         expr.newType.accept(this);
         expr.type=expr.newType.type;
     }
@@ -239,23 +250,30 @@ public class SemanticChecker implements ASTVisitor
 
     @Override public void visit(ClassExpression expr)
     {
-        String objectName=expr.objectName;
+        Expression objectExpr=expr.objectName;
+        String objectName=null;
+        if(!(objectExpr instanceof IdExpression || objectExpr instanceof IndexExpression))
+            throw new SemanticError(expr.pos,"Unexpected expression type here");
+        if(objectExpr instanceof IdExpression) objectName=((IdExpression) objectExpr).identifier;
+        else objectName=((IndexExpression) objectExpr).objName;
+
         if(!currentScope.containsVariable(objectName,true))
-            throw new SemanticError(expr.pos,"Undefined variable here.");
+            throw new SemanticError(expr.pos,"Undefined variable here");
         Type objectType=currentScope.getVariable(objectName,true);
+
         if(!globalScope.checkType(objectType.typeName()))
-            throw new SemanticError(expr.pos,"Undefined type here.");// Just for insurance.
+            throw new SemanticError(expr.pos,"Undefined type here");// Just for insurance.
         ClassDefine classDefine=globalScope.getClass(objectType.typeName());
 
         String methodName=expr.methodName;
         if(expr.functionFlag)
         {
             if(!classDefine.classScope.containsFunction(methodName,false))
-                throw new SemanticError(expr.pos,"Undefined method/function here.");
+                throw new SemanticError(expr.pos,"Undefined method/function here");
             FunctionDefine function=classDefine.classScope.getFunction(methodName,false);
             expr.values.accept(this);
             if(expr.values.expressions.size()!=function.paras.names.size())
-                throw new SemanticError(expr.values.pos,"Incorrect number of parameters.");
+                throw new SemanticError(expr.values.pos,"Incorrect number of parameters");
             expr.type=function.returnType;
         }
         else
@@ -269,33 +287,44 @@ public class SemanticChecker implements ASTVisitor
 
     @Override public void visit(IndexExpression expr)
     {
+        debug.module("IndexExpression");
         expr.index.accept(this);
         if(!expr.index.type.typeName().equals("int"))
-            throw new SemanticError(expr.index.pos,"Expect type <int> but <"+expr.index.type.typeName()+">.");
+            throw new SemanticError(expr.index.pos,"Expect type <int> but <"+expr.index.type.typeName()+">");
 
         expr.name.accept(this);
-        if(expr.name instanceof IdExpression) expr.type=expr.name.type;
-        else expr.type=new ArrayType(expr.pos,expr.name.type);
+        if(expr.name instanceof IdExpression)
+        {
+            expr.type=expr.name.type;
+            expr.objName=((IdExpression) expr.name).identifier;
+        }
+        else
+        {
+            if(!(expr.name instanceof IndexExpression))
+                throw new SemanticError(expr.name.pos,"Unexpected expression type");
+            expr.type=new ArrayType(expr.pos,expr.name.type);
+            expr.objName=((IndexExpression) expr.name).objName;
+        }
 
     }
 
     @Override public void visit(FuncExpression expr)
     {
         if(!currentScope.containsFunction(expr.funcName,true))
-            throw new SemanticError(expr.pos,"Nonexistent function <"+expr.funcName+">.");
+            throw new SemanticError(expr.pos,"Nonexistent function <"+expr.funcName+">");
         FunctionDefine function=currentScope.getFunction(expr.funcName,true);
         if(expr.values!=null)
         {
             if(function.paras==null)
-                 throw new SemanticError(expr.pos,"Incorrect number of parameters.");
+                 throw new SemanticError(expr.pos,"Incorrect number of parameters");
             expr.values.accept(this);
             if(expr.values.expressions.size()!=function.paras.names.size())
-                throw new SemanticError(expr.values.pos,"Incorrect number of parameters.");
+                throw new SemanticError(expr.values.pos,"Incorrect number of parameters");
         }
         else
         {
             if(function.paras!=null)
-                throw new SemanticError(expr.pos,"Incorrect number of parameters.");
+                throw new SemanticError(expr.pos,"Incorrect number of parameters");
         }
         expr.type=function.returnType;
     }
@@ -368,15 +397,18 @@ public class SemanticChecker implements ASTVisitor
         currentScope.functionType=def.returnType;
 
         if(globalScope.checkFuncName(def.funcName))
-            throw new SemanticError(def.pos,"Function name already exists.");
+            throw new SemanticError(def.pos,"Function name already exists");
+//        debug.print("Visit here, funcName="+def.funcName);
+        currentScope.putFunction(def);
 
-        def.paras.accept(this);
+        if(def.paras!=null) def.paras.accept(this);
 
         currentScope=new Scope(currentScope);
         currentScope.functionFlag=true;
 
-        currentScope.putParameters(def.paras);
+        if(def.paras!=null) currentScope.putParameters(def.paras);
         def.suite.accept(this);
+
         def.functionScope=currentScope;
         currentScope=currentScope.parentScope();
         currentScope.putFunction(def);
@@ -386,6 +418,7 @@ public class SemanticChecker implements ASTVisitor
     {
         if(globalScope.checkType(def.className))
             throw new SemanticError(def.pos,"Class name already exists.");
+        globalScope.addType(def.pos,def.className);
 
         currentScope=new Scope(currentScope);
         currentScope.classFlag=true;
@@ -415,7 +448,7 @@ public class SemanticChecker implements ASTVisitor
     {
         if(currentScope.containsVariable(def.name,false))
             throw new SemanticError(def.pos,"Variable name already exists.");
-
+        currentScope.putVariable(def.type,def.name);
         if(def.expr!=null)
         {
             def.expr.accept(this);
@@ -439,7 +472,7 @@ public class SemanticChecker implements ASTVisitor
             throw new SemanticError(type.pos,"Undefined type used.");
     }
 
-    @Override public void visit(ArrayType type) {type.baseType.accept(this);}
+    @Override public void visit(ArrayType type) {debug.module("ArrayType");type.baseType.accept(this);}
 
     @Override public void visit(VoidType type) {}
 
@@ -491,6 +524,7 @@ public class SemanticChecker implements ASTVisitor
 
     @Override public void visit(ArrayInitial tool)
     {
+        debug.module("ArrayInitial");
         tool.baseType.accept(this);
         for(var it: tool.expressions)
         {

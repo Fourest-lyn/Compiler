@@ -8,11 +8,7 @@ public class ContinueStatement extends Statement
 {
     public ASTNode destination;
 
-    public ContinueStatement(Position pos)
-    {
-        super(pos);
-    }
+    public ContinueStatement(Position pos) {super(pos);}
 
-    @Override
-    public void accept(ASTVisitor visitor) {visitor.visit(this);}
+    @Override public void accept(ASTVisitor visitor) {visitor.visit(this);}
 }

@@ -14,7 +14,7 @@ import java.util.Map;
 public class Scope
 {
     private Scope parentScope;
-    private Map<String,FunctionDefine> functions;
+    protected Map<String,FunctionDefine> functions;
     private Map<String, Type> variables;
     public boolean classFlag=false,functionFlag=false;
     public Type classType=null;
@@ -26,6 +26,15 @@ public class Scope
         this.parentScope=parentScope;
         this.variables=new HashMap<>();
         this.functions=new HashMap<>();
+
+        if(parentScope!=null)
+        {
+            this.functionFlag=parentScope.functionFlag;
+            this.functionType=parentScope.functionType;
+            this.classFlag=parentScope.classFlag;
+            this.classType=parentScope.classType;
+            this.loopStage=parentScope.loopStage;
+        }
     }
 
     public Scope parentScope() {return parentScope;}

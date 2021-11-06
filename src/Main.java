@@ -9,6 +9,8 @@ import Util.Scope.GlobalScope;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.io.FileInputStream;
+
 /**
  * This is a compiler for language Mx*
  * This project hasn't complete yet.
@@ -21,8 +23,13 @@ public class Main
     public static void main(String[] args) throws Exception
     {
         // Only semantic check now.
+        boolean semanticCheckLocalFlag=true;
         var input=System.in;
 
+        if(semanticCheckLocalFlag)
+        {
+            input=new FileInputStream("testcases/sema/basic-package/basic-6.mx");
+        }
         try
         {
 

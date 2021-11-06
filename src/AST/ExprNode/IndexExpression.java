@@ -6,6 +6,7 @@ import Util.Position;
 public class IndexExpression extends Expression
 {
     public Expression name,index;
+    public String objName;
     public IndexExpression(Position pos,Expression name,Expression index)
     {
         super(pos);

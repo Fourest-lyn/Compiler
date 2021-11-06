@@ -12,14 +12,14 @@ import java.util.Map;
 public class GlobalScope extends Scope
 {
     private Map<String,ClassDefine> classes;
-    private Map<String,FunctionDefine> functions;
+//    private Map<String,FunctionDefine> functions;
 
     public GlobalScope()
     {
         super(null);
 
         classes =new HashMap<>();
-        functions =new HashMap<>();
+//        functions =new HashMap<>();
 
         Position pos=new Position(0,0);
 

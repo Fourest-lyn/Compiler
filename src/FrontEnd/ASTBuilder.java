@@ -13,11 +13,13 @@ import AST.TypeNode.Type;
 import AST.TypeNode.VoidType;
 import Parser.MxBaseVisitor;
 import Parser.MxParser;
+import Util.Debug;
 import Util.Error.SyntaxError;
 import Util.Position;
 import Util.Scope.GlobalScope;
 import Util.Scope.Scope;
 
+import javax.sql.PooledConnection;
 import java.util.ArrayList;
 
 public class ASTBuilder extends MxBaseVisitor<ASTNode>
@@ -48,12 +50,16 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
 
     @Override public ASTNode visitType(MxParser.TypeContext ctx)
     {
+        if(ctx.baseType()!=null) return (BaseType) visit(ctx.baseType());
         return new ArrayType(new Position(ctx), (Type) visit(ctx.type()));
     }
 
     @Override public ASTNode visitValueDef(MxParser.ValueDefContext ctx)
     {
-        return new SingleDefine(new Position(ctx), ctx.IDENTIFIER().getText(), (Expression) visit(ctx.expression()));
+        String id=ctx.IDENTIFIER().getText();
+        Expression expr=null;
+        if(ctx.expression()!=null) expr=(Expression) visit(ctx.expression());
+        return new SingleDefine(new Position(ctx),id,expr);
     }
 
     @Override public ASTNode visitValueDefine(MxParser.ValueDefineContext ctx)
@@ -98,7 +104,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
     @Override public ASTNode visitReturnType(MxParser.ReturnTypeContext ctx)
     {
         if(ctx.VOID()!=null) return new VoidType(new Position(ctx));
-        return (ArrayType) visit(ctx.type());
+        return (Type) visit(ctx.type());
     }
 
     @Override public ASTNode visitFunctionParameter(MxParser.FunctionParameterContext ctx)
@@ -114,14 +120,16 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
     {
         Type returnType= (Type) visit(ctx.returnType());
         String funcName=ctx.IDENTIFIER().getText();
-        FunctionParameter paras= (FunctionParameter) visit(ctx.functionParameter());
+        FunctionParameter paras=null;
+        if(ctx.functionParameter()!=null) paras=(FunctionParameter) visit(ctx.functionParameter());
         BlockStatement suite= (BlockStatement) visit(ctx.suite());
         return new FunctionDefine(new Position(ctx),returnType,funcName,paras,suite);
     }
 
     @Override public ASTNode visitLambdaFunction(MxParser.LambdaFunctionContext ctx)
     {
-        FunctionParameter paras= (FunctionParameter) visit(ctx.functionParameter());
+        FunctionParameter paras=null;
+        if(ctx.functionParameter()!=null) paras=(FunctionParameter) visit(ctx.functionParameter());
         BlockStatement suite= (BlockStatement) visit(ctx.suite());
         ValueList valueList= (ValueList) visit(ctx.valueList());
         return new LambdaFunction(new Position(ctx),paras,suite,valueList);
@@ -153,14 +161,11 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
         return new BlockStatement(new Position(ctx),stmts);
     }
 
-    @Override public ASTNode visitBlock(MxParser.BlockContext ctx)
-    {
-        return visit(ctx.suite());
-    }
+    @Override public ASTNode visitBlock(MxParser.BlockContext ctx) {return visit(ctx.suite());}
 
     @Override public ASTNode visitValueDefStmt(MxParser.ValueDefStmtContext ctx)
     {
-        return visit(ctx.valueDefine());
+        return new ValueDefStatement(new Position(ctx), (ValueDefine) visit(ctx.valueDefine()));
     }
 
     @Override public ASTNode visitIfStmt(MxParser.IfStmtContext ctx)
@@ -218,11 +223,15 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
 
     @Override public ASTNode visitNewExpr(MxParser.NewExprContext ctx)
     {
+        Debug debug=new Debug();
+        debug.builder("NewExpr",ctx.getText());
         return new NewExpression(new Position(ctx), (NewType) visit(ctx.newType()));
     }
 
     @Override public ASTNode visitIndexExpr(MxParser.IndexExprContext ctx)
     {
+        Debug debug=new Debug();
+        debug.builder("IndexExpr",ctx.getText());
         Expression name= (Expression) visit(ctx.name);
         Expression index=(Expression) visit(ctx.index);
         return new IndexExpression(new Position(ctx),name,index);
@@ -249,7 +258,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
     @Override public ASTNode visitClassExpr(MxParser.ClassExprContext ctx)
     {
         if(ctx.THIS()!=null) return new ThisExpression(new Position(ctx));
-        String className=ctx.id.getText();
+        Expression className= (Expression) visit(ctx.id);
         String methodName=ctx.func.getText();
         ValueList values=null;
         boolean functionFlag=(ctx.LEFTPAREN()!=null && ctx.RIGHTPAREN()!=null);
@@ -292,6 +301,8 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
         if(ctx.CARET()!=null) op= BinaryExpression.Operator.XOR;
         if(ctx.ANDAND()!=null) op= BinaryExpression.Operator.LAND;
         if(ctx.OROR()!=null) op= BinaryExpression.Operator.LOR;
+        if(ctx.PLUS()!=null) op= BinaryExpression.Operator.ADD;
+        if(ctx.MINUS()!=null) op= BinaryExpression.Operator.SUB;
         return new BinaryExpression(new Position(ctx),op,left,right);
     }
 
@@ -305,7 +316,8 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
     @Override public ASTNode visitFunctionExpr(MxParser.FunctionExprContext ctx)
     {
         String funcName=ctx.IDENTIFIER().getText();
-        ValueList values= (ValueList) visit(ctx.valueList());
+        ValueList values= null;
+        if(ctx.valueList()!=null) values= (ValueList) visit(ctx.valueList());
         return new FuncExpression(new Position(ctx),funcName,values);
     }
 
