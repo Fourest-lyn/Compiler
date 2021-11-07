@@ -42,11 +42,16 @@ public class SemanticChecker implements ASTVisitor
             var it=node.defines.get(i);
             if(it instanceof FunctionDefine)
                 if(((FunctionDefine) it).funcName.equals("main"))
+                {
                     if(((FunctionDefine) it).returnType.typeName().equals("int"))
                     {
                         mainFlag = true;
                         mainNum = i;
                     }
+                    if(((FunctionDefine) it).paras!=null)
+                        throw new SemanticError(it.pos,"Main function should not have parameters");
+                }
+
             it.accept(this);
         }
         if(!mainFlag) throw new SemanticError(node.pos,"Without function <int main()>");
@@ -252,14 +257,24 @@ public class SemanticChecker implements ASTVisitor
         expr.objectName.accept(this);
         Expression objectExpr=expr.objectName;
         String objectName;
-        if(!(objectExpr instanceof IdExpression || objectExpr instanceof IndexExpression || (objectExpr instanceof ConstExpression && Objects.equals(((ConstExpression) objectExpr).kind, "string"))))
-            throw new SemanticError(expr.pos,"Unexpected expression type");
+//        if(!(objectExpr instanceof IdExpression || objectExpr instanceof IndexExpression))
+//            throw new SemanticError(expr.pos,"Unexpected expression type");
         if(objectExpr instanceof IdExpression) objectName=((IdExpression) objectExpr).identifier;
         else if(objectExpr instanceof IndexExpression) objectName=((IndexExpression) objectExpr).objName;
-        else objectName=((ConstExpression) objectExpr).kind;// consider: how to save the value of constValue.
+        else if(objectExpr instanceof ConstExpression && Objects.equals(((ConstExpression) objectExpr).kind, "string")) objectName=((ConstExpression) objectExpr).kind;// consider: how to save the value of constValue.
+        else if(objectExpr instanceof ThisExpression)
+        {
+            objectName="this";
+        }
+        else if(objectExpr instanceof ClassExpression)
+        {
+            debug.print(expr.methodName);
+            objectName="";
+        }
+        else throw new SemanticError(expr.pos,"Unexpected expression type");
 
         // Check for ArrayType's size() method.
-        if(expr.objectName.type instanceof ArrayType && Objects.equals(expr.methodName,"size"))
+        if(objectExpr.type instanceof ArrayType && Objects.equals(expr.methodName,"size"))
         {
             if(expr.values!=null)
                 throw new SemanticError(expr.values.pos,"Incorrect number of parameters");
@@ -271,6 +286,12 @@ public class SemanticChecker implements ASTVisitor
         if(objectExpr instanceof ConstExpression)
         {
             objectType=new BaseType(objectExpr.pos,"string");
+        }
+        else if(objectExpr instanceof ThisExpression)
+        {
+            objectType=currentScope.classType;
+            if(currentScope.classType==null)
+                throw new SemanticError(expr.pos,"Unexpected appearance of <this>");
         }
         else
         {
@@ -302,6 +323,7 @@ public class SemanticChecker implements ASTVisitor
             if(!classDefine.classScope.checkVariable(methodName,false))
                 throw new SemanticError(expr.pos,"Undefined variable here");
             expr.type= classDefine.classScope.getVariable(methodName,false);
+            expr.leftFlag=true;
         }
 
     }
@@ -501,11 +523,16 @@ public class SemanticChecker implements ASTVisitor
             if(def.expr.nullFlag)
             {
                 if(def.type.typeName().equals("int") || def.type.typeName().equals("bool"))
-                    throw new SemanticError(def.expr.pos,"Null could not assign to <int> & <bool>.");
+                    throw new SemanticError(def.expr.pos,"Null could not assign to <int> & <bool>");
             }
             else
             {
-                if(!def.type.typeName().equals(def.expr.type.typeName()))
+                if(def.expr.type.typeName().equals("null"))
+                {
+                    if(def.type.typeName().equals("int") || def.type.typeName().equals("bool"))
+                        throw new SemanticError(def.expr.pos,"Null could not assign to <int> & <bool>");
+                }
+                else if(!def.type.typeName().equals(def.expr.type.typeName()))
                     throw new SemanticError(def.expr.pos,"Incorrect Type of expression");
             }
         }
@@ -563,6 +590,7 @@ public class SemanticChecker implements ASTVisitor
         if(tool.valuelist.expressions.size()!=tool.paras.names.size())
             throw new SemanticError(tool.valuelist.pos,"Incorrect number of parameters.");
         currentScope=new Scope(currentScope);
+        currentScope.returnType = null;
         currentScope.putParameters(tool.paras);
         currentScope.functionFlag=true;
         tool.suite.accept(this);

@@ -25,13 +25,16 @@ public class Main
     {
         // Only semantic check now.
         boolean semanticCheckLocalFlag=false;
-        String address="testcases/sema/basic-package/basic-39.mx";
-//        System.out.println("Test address:"+address+"\n");
-        //consider: basic-35;
+        String address="testcases/sema/basic-package/basic-49.mx";
+        //consider: basic-35,basic-44;
         //ask: basic-39
 
         var input=System.in;
-        if(semanticCheckLocalFlag) input=new FileInputStream(address);
+        if(semanticCheckLocalFlag)
+        {
+            System.out.println("Test address:"+address+"\n");
+            input=new FileInputStream(address);
+        }
 
         try
         {

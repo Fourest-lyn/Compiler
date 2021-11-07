@@ -67,35 +67,35 @@ public class GlobalScope extends Scope
 
         /** Class String */
         ArrayList<FunctionDefine> stringFunctions=new ArrayList<>();
-        Scope stringScope=new Scope(this);
-        stringScope.classFlag=true;
-        stringScope.classType=new BaseType(pos,"string");
+        Scope tempScope=new Scope(this);
+        tempScope.classFlag=true;
+        tempScope.classType=new BaseType(pos,"string");
 
         //int length();
         tempFunction=new FunctionDefine(pos,new BaseType(pos,"int"),"length",null,null);
         stringFunctions.add(tempFunction);
-        stringScope.putFunction(tempFunction);
+        tempScope.putFunction(tempFunction);
 
         //string substring(int left, int right);
         tempFunction=new FunctionDefine(pos,new BaseType(pos,"string"),"substring");
         tempFunction.paras.addBasic(new BaseType(pos,"int"),"left");
         tempFunction.paras.addBasic(new BaseType(pos,"int"),"right");
         stringFunctions.add(tempFunction);
-        stringScope.putFunction(tempFunction);
+        tempScope.putFunction(tempFunction);
 
         //int parseInt();
         tempFunction=new FunctionDefine(pos,new BaseType(pos,"int"),"parseInt",null,null);
         stringFunctions.add(tempFunction);
-        stringScope.putFunction(tempFunction);
+        tempScope.putFunction(tempFunction);
 
         //int ord(int pos);
         tempFunction=new FunctionDefine(pos,new BaseType(pos,"int"),"ord");
         tempFunction.paras.addBasic(new BaseType(pos,"int"),"pos");
         stringFunctions.add(tempFunction);
-        stringScope.putFunction(tempFunction);
+        tempScope.putFunction(tempFunction);
 
         ClassDefine stringClass=new ClassDefine(pos,"string",null,null,stringFunctions);
-        stringClass.classScope=stringScope;
+        stringClass.classScope=tempScope;
         classes.put("string",stringClass);
     }
 
