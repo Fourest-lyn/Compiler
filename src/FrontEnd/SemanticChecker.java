@@ -125,7 +125,6 @@ public class SemanticChecker implements ASTVisitor
         stmt.condition.accept(this);
         if(!stmt.condition.type.equals(new BaseType(stmt.pos,"bool")))
             throw new SemanticError(stmt.condition.pos,"Expect type <bool> for condition");
-
         if(stmt.stmt!=null)
         {
             currentScope=new Scope(currentScope);
@@ -138,7 +137,12 @@ public class SemanticChecker implements ASTVisitor
     @Override public void visit(ForStatement stmt)
     {
         if(stmt.init!=null) stmt.init.accept(this);
-        if(stmt.condition!=null) stmt.condition.accept(this);
+        if(stmt.condition!=null)
+        {
+            stmt.condition.accept(this);
+            if(!stmt.condition.type.equals(new BaseType(stmt.pos,"bool")))
+                throw new SemanticError(stmt.condition.pos,"Expect type <bool> for condition");
+        }
         if(stmt.incr!=null) stmt.incr.accept(this);
         if(stmt.stmt!=null)
         {
