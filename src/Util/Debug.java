@@ -2,7 +2,7 @@ package Util;
 
 public class Debug
 {
-    private boolean debugFlag=true;
+    private boolean debugFlag=false;
     public void print(String str)
     {
         if(!debugFlag) return;

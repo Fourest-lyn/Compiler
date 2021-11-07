@@ -23,12 +23,12 @@ public class Main
     public static void main(String[] args) throws Exception
     {
         // Only semantic check now.
-        boolean semanticCheckLocalFlag=true;
+        boolean semanticCheckLocalFlag=false;
         var input=System.in;
 
         if(semanticCheckLocalFlag)
         {
-            input=new FileInputStream("testcases/sema/basic-package/basic-6.mx");
+            input=new FileInputStream("testcases/sema/basic-package/basic-7.mx");
         }
         try
         {
