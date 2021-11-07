@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 public class ASTBuilder extends MxBaseVisitor<ASTNode>
 {
+    Debug debug=new Debug();
 
     @Override public ASTNode visitProgram(MxParser.ProgramContext ctx)
     {
@@ -50,7 +51,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
 
     @Override public ASTNode visitType(MxParser.TypeContext ctx)
     {
-        if(ctx.baseType()!=null) return (BaseType) visit(ctx.baseType());
+        if(ctx.baseType()!=null) return visit(ctx.baseType());
         return new ArrayType(new Position(ctx), (Type) visit(ctx.type()));
     }
 
@@ -89,6 +90,8 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
 
     @Override public ASTNode visitArrayInitial(MxParser.ArrayInitialContext ctx)
     {
+        debug.builder("ArrayInitial",ctx.getText());
+
         BaseType baseType=(BaseType) visit(ctx.baseType());
         ArrayList<Expression> expressions=new ArrayList<>();
         for(var it: ctx.expression()) expressions.add((Expression) visit(it));
@@ -104,14 +107,14 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
     @Override public ASTNode visitReturnType(MxParser.ReturnTypeContext ctx)
     {
         if(ctx.VOID()!=null) return new VoidType(new Position(ctx));
-        return (Type) visit(ctx.type());
+        return visit(ctx.type());
     }
 
     @Override public ASTNode visitFunctionParameter(MxParser.FunctionParameterContext ctx)
     {
-        ArrayList<ArrayType> types=new ArrayList<>();
+        ArrayList<Type> types=new ArrayList<>();
         ArrayList<String> names=new ArrayList<>();
-        for(var it:ctx.type()) types.add((ArrayType) visit(it));
+        for(var it:ctx.type()) types.add((Type) visit(it));
         for(var it:ctx.IDENTIFIER()) names.add(it.getText());
         return new FunctionParameter(new Position(ctx),types,names);
     }
@@ -223,14 +226,12 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
 
     @Override public ASTNode visitNewExpr(MxParser.NewExprContext ctx)
     {
-        Debug debug=new Debug();
         debug.builder("NewExpr",ctx.getText());
         return new NewExpression(new Position(ctx), (NewType) visit(ctx.newType()));
     }
 
     @Override public ASTNode visitIndexExpr(MxParser.IndexExprContext ctx)
     {
-        Debug debug=new Debug();
         debug.builder("IndexExpr",ctx.getText());
         Expression name= (Expression) visit(ctx.name);
         Expression index=(Expression) visit(ctx.index);
@@ -257,6 +258,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
 
     @Override public ASTNode visitClassExpr(MxParser.ClassExprContext ctx)
     {
+        debug.builder("ClassExpr",ctx.getText());
         if(ctx.THIS()!=null) return new ThisExpression(new Position(ctx));
         Expression className= (Expression) visit(ctx.id);
         String methodName=ctx.func.getText();
@@ -268,7 +270,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
 
     @Override public ASTNode visitAtomExpr(MxParser.AtomExprContext ctx)
     {
-        return (Expression)visit(ctx.primary());
+        return visit(ctx.primary());
     }
 
     @Override public ASTNode visitIncrExpr(MxParser.IncrExprContext ctx)
@@ -325,7 +327,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
     {
         if(ctx.IDENTIFIER()!=null) return new IdExpression(new Position(ctx),ctx.IDENTIFIER().getText());
         if(ctx.literal()!=null) return visit(ctx.literal());
-        return (Expression)visit(ctx.expression());
+        return visit(ctx.expression());
     }
 
     @Override public ASTNode visitLiteral(MxParser.LiteralContext ctx)

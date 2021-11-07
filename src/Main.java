@@ -1,6 +1,7 @@
 import AST.ProgramNode;
 import FrontEnd.ASTBuilder;
 import FrontEnd.SemanticChecker;
+import FrontEnd.SymbolCollector;
 import Parser.MxLexer;
 import Parser.MxParser;
 import Util.Error.Error;
@@ -48,6 +49,7 @@ public class Main
 
             ASTBuilder astBuilder=new ASTBuilder();
             rootNode= (ProgramNode) astBuilder.visit(parseRoot);
+            new SymbolCollector(globalScope).visit(rootNode);
             new SemanticChecker(globalScope).visit(rootNode);
         }
         catch (Error error)

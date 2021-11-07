@@ -4,16 +4,17 @@ import AST.ASTNode;
 import AST.ASTVisitor;
 import AST.TypeNode.ArrayType;
 import AST.TypeNode.BaseType;
+import AST.TypeNode.Type;
 import Util.Position;
 
 import java.util.ArrayList;
 
 public class FunctionParameter extends ASTNode
 {
-    public ArrayList<ArrayType> types;
+    public ArrayList<Type> types;
     public ArrayList<String> names;
 
-    public FunctionParameter(Position pos,ArrayList<ArrayType> types,ArrayList<String> names)
+    public FunctionParameter(Position pos,ArrayList<Type> types,ArrayList<String> names)
     {
         super(pos);
         this.types=types;

@@ -15,7 +15,7 @@ public class Scope
 {
     private Scope parentScope;
     protected Map<String,FunctionDefine> functions;
-    private Map<String, Type> variables;
+    protected Map<String, Type> variables;
     public boolean classFlag=false,functionFlag=false;
     public Type classType=null;
     public Type functionType=null;
@@ -45,10 +45,10 @@ public class Scope
         variables.put(name,type);
     }
 
-    public boolean containsVariable(String name,boolean upperCheckFlag)
+    public boolean checkVariable(String name, boolean upperCheckFlag)
     {
         if(variables.containsKey(name)) return true;
-        if(upperCheckFlag && parentScope!=null) return parentScope.containsVariable(name,true);
+        if(upperCheckFlag && parentScope!=null) return parentScope.checkVariable(name,true);
         return false;
     }
 

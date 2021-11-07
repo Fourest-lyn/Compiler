@@ -66,7 +66,7 @@ public class MxBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements MxV
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitObjectInitial(MxParser.ObjectInitialContext ctx) { return visitChildren(ctx); }
+	@Override public T visitWrongInitial(MxParser.WrongInitialContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -80,7 +80,7 @@ public class MxBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements MxV
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitWrongInitial(MxParser.WrongInitialContext ctx) { return visitChildren(ctx); }
+	@Override public T visitObjectInitial(MxParser.ObjectInitialContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

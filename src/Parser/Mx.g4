@@ -10,9 +10,11 @@ valueDef: IDENTIFIER ('=' expression)? ;
 valueDefine: type valueDef (',' valueDef)* ';';
 valueList: expression (',' expression)*;
 newType
-    : baseType ('('')')?                                                        #objectInitial
+    : baseType ('['expression']')*('['']')+'['expression']'('['expression?']')* #wrongInitial
     | baseType ('['expression']')+('['']')*                                     #arrayInitial
-    | baseType ('['expression']')+('['']')+'['expression']'('['expression?']')* #wrongInitial
+    | baseType ('('')')?                                                        #objectInitial
+
+
 ;
 
 returnType: type | VOID;

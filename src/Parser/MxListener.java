@@ -78,17 +78,17 @@ public interface MxListener extends ParseTreeListener {
 	 */
 	void exitValueList(MxParser.ValueListContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code objectInitial}
+	 * Enter a parse tree produced by the {@code wrongInitial}
 	 * labeled alternative in {@link MxParser#newType}.
 	 * @param ctx the parse tree
 	 */
-	void enterObjectInitial(MxParser.ObjectInitialContext ctx);
+	void enterWrongInitial(MxParser.WrongInitialContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code objectInitial}
+	 * Exit a parse tree produced by the {@code wrongInitial}
 	 * labeled alternative in {@link MxParser#newType}.
 	 * @param ctx the parse tree
 	 */
-	void exitObjectInitial(MxParser.ObjectInitialContext ctx);
+	void exitWrongInitial(MxParser.WrongInitialContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code arrayInitial}
 	 * labeled alternative in {@link MxParser#newType}.
@@ -102,17 +102,17 @@ public interface MxListener extends ParseTreeListener {
 	 */
 	void exitArrayInitial(MxParser.ArrayInitialContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code wrongInitial}
+	 * Enter a parse tree produced by the {@code objectInitial}
 	 * labeled alternative in {@link MxParser#newType}.
 	 * @param ctx the parse tree
 	 */
-	void enterWrongInitial(MxParser.WrongInitialContext ctx);
+	void enterObjectInitial(MxParser.ObjectInitialContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code wrongInitial}
+	 * Exit a parse tree produced by the {@code objectInitial}
 	 * labeled alternative in {@link MxParser#newType}.
 	 * @param ctx the parse tree
 	 */
-	void exitWrongInitial(MxParser.WrongInitialContext ctx);
+	void exitObjectInitial(MxParser.ObjectInitialContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MxParser#returnType}.
 	 * @param ctx the parse tree

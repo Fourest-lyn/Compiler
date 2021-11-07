@@ -18,6 +18,7 @@ public class ArrayInitial extends NewType
         super(pos,baseType);
         this.expressions=expressions;
         this.dimension=dimension;
+        this.baseType=baseType;
     }
 
     @Override public void accept(ASTVisitor visitor) {visitor.visit(this);}

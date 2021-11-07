@@ -97,12 +97,22 @@ public class GlobalScope extends Scope
         classes.put(typeName,new ClassDefine(pos,typeName,null,null,null));
     }
 
+    public void addClass(ClassDefine def)
+    {
+        classes.put(def.className,def);
+    }
+
+    public void removeClass(String className)
+    {
+        classes.remove(className);
+    }
+
     public boolean checkType(String typeName) {return classes.containsKey(typeName);}
 
-    public boolean checkForNewName(String typeName)
+    public boolean checkForClassName(String typeName)
     {
-        boolean out=classes.containsKey(typeName);
-        out=out || functions.containsKey(typeName);
+        boolean out=functions.containsKey(typeName);
+        out=out || variables.containsKey(typeName);
         return out;
     }
 

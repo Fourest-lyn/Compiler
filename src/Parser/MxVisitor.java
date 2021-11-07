@@ -53,12 +53,12 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitValueList(MxParser.ValueListContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code objectInitial}
+	 * Visit a parse tree produced by the {@code wrongInitial}
 	 * labeled alternative in {@link MxParser#newType}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitObjectInitial(MxParser.ObjectInitialContext ctx);
+	T visitWrongInitial(MxParser.WrongInitialContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code arrayInitial}
 	 * labeled alternative in {@link MxParser#newType}.
@@ -67,12 +67,12 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitArrayInitial(MxParser.ArrayInitialContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code wrongInitial}
+	 * Visit a parse tree produced by the {@code objectInitial}
 	 * labeled alternative in {@link MxParser#newType}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitWrongInitial(MxParser.WrongInitialContext ctx);
+	T visitObjectInitial(MxParser.ObjectInitialContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MxParser#returnType}.
 	 * @param ctx the parse tree

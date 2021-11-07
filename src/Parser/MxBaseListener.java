@@ -100,13 +100,13 @@ public class MxBaseListener implements MxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterObjectInitial(MxParser.ObjectInitialContext ctx) { }
+	@Override public void enterWrongInitial(MxParser.WrongInitialContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitObjectInitial(MxParser.ObjectInitialContext ctx) { }
+	@Override public void exitWrongInitial(MxParser.WrongInitialContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -124,13 +124,13 @@ public class MxBaseListener implements MxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterWrongInitial(MxParser.WrongInitialContext ctx) { }
+	@Override public void enterObjectInitial(MxParser.ObjectInitialContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitWrongInitial(MxParser.WrongInitialContext ctx) { }
+	@Override public void exitObjectInitial(MxParser.ObjectInitialContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
