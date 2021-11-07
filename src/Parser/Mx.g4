@@ -13,8 +13,6 @@ newType
     : baseType ('['expression']')*('['']')+'['expression']'('['expression?']')* #wrongInitial
     | baseType ('['expression']')+('['']')*                                     #arrayInitial
     | baseType ('('')')?                                                        #objectInitial
-
-
 ;
 
 returnType: type | VOID;
@@ -45,22 +43,22 @@ statement
 expression
     : primary                                               #atomExpr
     | NEW newType                                           #newExpr
+    | id=expression '.' func=IDENTIFIER('('valueList?')')?  #classExpr
     | name=expression '[' index=expression ']'              #indexExpr
+    | expression op = ('++'|'--')                           #incrExpr
+    | <assoc=right> op = ('++'|'--') expression             #unaryExpr
+    | <assoc=right> op = ('~'|'!'|'-'|'+') expression       #unaryExpr
     | left=expression op = ('*'|'/'|'%') right=expression   #binaryExpr
+    | left=expression op = ('+'|'-') right=expression       #binaryExpr
     | left=expression op = ('<<'|'>>') right=expression     #binaryExpr
     | left=expression op = ('<'|'<=') right=expression      #binaryExpr
     | left=expression op = ('>'|'>=') right=expression      #binaryExpr
     | left=expression op = ('=='|'!=') right=expression     #binaryExpr
     | left=expression op = ('&'|'|'|'^') right=expression   #binaryExpr
     | left=expression op = ('&&'|'||') right=expression     #binaryExpr
-    | left=expression op = ('+'|'-') right=expression       #binaryExpr
-    | expression op = ('++'|'--')                           #incrExpr
-    | <assoc=right> op = ('~'|'!'|'-'|'+') expression       #unaryExpr
-    | <assoc=right> op = ('++'|'--') expression             #unaryExpr
     | <assoc=right> left=expression '=' right=expression    #assignExpr
     | IDENTIFIER'('valueList?')'                            #functionExpr
     | lambdaFunction                                        #lambdaExpr
-    | id=expression '.' func=IDENTIFIER('('valueList?')')?  #classExpr
     | THIS                                                  #classExpr
 
 ;

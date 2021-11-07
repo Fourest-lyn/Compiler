@@ -30,7 +30,7 @@ public class FunctionParameter extends ASTNode
 
     public void addBasic(BaseType baseType,String name)
     {
-        types.add(new ArrayType(this.pos,baseType));
+        types.add(baseType);
         names.add(name);
     }
 

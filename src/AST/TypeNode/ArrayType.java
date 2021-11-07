@@ -13,7 +13,7 @@ public class ArrayType extends Type
         super(pos, type.typeName());
         if(type instanceof ArrayType)
         {
-            this.baseType=((ArrayType) type).baseType;
+            this.baseType=type;
             this.dimension=((ArrayType) type).dimension+1;
         }
         else

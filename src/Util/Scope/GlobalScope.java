@@ -24,6 +24,8 @@ public class GlobalScope extends Scope
         Position pos=new Position(0,0);
 
         /** Reversed Types */
+//        ClassDefine tempClass=new ClassDefine(pos,"int",null,null,null);
+//        tempClass.classScope=new Scope(this);
         classes.put("int",new ClassDefine(pos,"int",null,null,null));
         classes.put("bool",new ClassDefine(pos,"bool",null,null,null));
         classes.put("void",new ClassDefine(pos,"void",null,null,null));

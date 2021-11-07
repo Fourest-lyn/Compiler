@@ -65,6 +65,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
 
     @Override public ASTNode visitValueDefine(MxParser.ValueDefineContext ctx)
     {
+        debug.builder("ValueDefine",ctx.getText());
         ArrayList<SingleDefine> defines=new ArrayList<>();
         Type type=(Type) visit(ctx.type());
         for(var it:ctx.valueDef())
@@ -240,6 +241,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
 
     @Override public ASTNode visitUnaryExpr(MxParser.UnaryExprContext ctx)
     {
+        debug.builder("UnaryExpr",ctx.getText());
         Expression rightExpr= (Expression) visit(ctx.expression());
         UnaryExpression.Operator op=null;
         if(ctx.NOT()!=null) op= UnaryExpression.Operator.LNOT;
@@ -284,6 +286,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
 
     @Override public ASTNode visitBinaryExpr(MxParser.BinaryExprContext ctx)
     {
+        debug.builder("BinaryExpr",ctx.getText());
         Expression left= (Expression) visit(ctx.left);
         Expression right=(Expression) visit(ctx.right);
         BinaryExpression.Operator op=null;

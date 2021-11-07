@@ -95,7 +95,8 @@ public class SemanticChecker implements ASTVisitor
             }
             else
             {
-                if(currentScope.functionType.typeName().equals("int") || currentScope.functionType.typeName().equals("bool"))
+                String tempName=currentScope.functionType.typeName();
+                if((tempName.equals("int") || tempName.equals("bool")) && !(currentScope.functionType instanceof ArrayType))
                     throw new SemanticError(stmt.pos,"Null could not assign to <int> & <bool>.");
             }
             currentScope.returnType=stmt.expr.type;
@@ -169,6 +170,7 @@ public class SemanticChecker implements ASTVisitor
     /** Expression */
     @Override public void visit(BinaryExpression expr)
     {
+//        debug.module("BinaryExpression "+expr.pos.toString());
         expr.leftExpr.accept(this);
         expr.rightExpr.accept(this);
         String leftType=expr.leftExpr.type.typeName();
@@ -257,21 +259,13 @@ public class SemanticChecker implements ASTVisitor
         expr.objectName.accept(this);
         Expression objectExpr=expr.objectName;
         String objectName;
-//        if(!(objectExpr instanceof IdExpression || objectExpr instanceof IndexExpression))
-//            throw new SemanticError(expr.pos,"Unexpected expression type");
-        if(objectExpr instanceof IdExpression) objectName=((IdExpression) objectExpr).identifier;
-        else if(objectExpr instanceof IndexExpression) objectName=((IndexExpression) objectExpr).objName;
-        else if(objectExpr instanceof ConstExpression && Objects.equals(((ConstExpression) objectExpr).kind, "string")) objectName=((ConstExpression) objectExpr).kind;// consider: how to save the value of constValue.
-        else if(objectExpr instanceof ThisExpression)
-        {
-            objectName="this";
-        }
-        else if(objectExpr instanceof ClassExpression)
-        {
-            debug.print(expr.methodName);
-            objectName="";
-        }
-        else throw new SemanticError(expr.pos,"Unexpected expression type");
+
+//        if(objectExpr instanceof IdExpression) objectName=((IdExpression) objectExpr).identifier;
+//        else if(objectExpr instanceof IndexExpression) objectName=((IndexExpression) objectExpr).objName;
+//        else if(objectExpr instanceof ConstExpression && Objects.equals(((ConstExpression) objectExpr).kind, "string")) objectName=((ConstExpression) objectExpr).kind;// consider: how to save the value of constValue.
+//        else if(objectExpr instanceof ThisExpression) objectName="this";
+//        else if(objectExpr instanceof ClassExpression) objectName="";
+//        else throw new SemanticError(expr.pos,"Unexpected expression type");
 
         // Check for ArrayType's size() method.
         if(objectExpr.type instanceof ArrayType && Objects.equals(expr.methodName,"size"))
@@ -282,23 +276,33 @@ public class SemanticChecker implements ASTVisitor
             return;
         }
 
-        Type objectType=null;
-        if(objectExpr instanceof ConstExpression)
-        {
-            objectType=new BaseType(objectExpr.pos,"string");
-        }
-        else if(objectExpr instanceof ThisExpression)
-        {
-            objectType=currentScope.classType;
-            if(currentScope.classType==null)
-                throw new SemanticError(expr.pos,"Unexpected appearance of <this>");
-        }
-        else
-        {
-            if(!currentScope.checkVariable(objectName,true))
-                throw new SemanticError(expr.pos,"Undefined variable here");
-            objectType=currentScope.getVariable(objectName,true);
-        }
+        Type objectType=objectExpr.type;
+//        if(objectExpr instanceof ConstExpression)
+//        {
+//            objectType=new BaseType(objectExpr.pos,"string");
+//        }
+//        else if(objectExpr instanceof ThisExpression)
+//        {
+//            objectType=currentScope.classType;
+//            if(currentScope.classType==null)
+//                throw new SemanticError(expr.pos,"Unexpected appearance of <this>");
+//        }
+//        else if(objectExpr instanceof ClassExpression)
+//        {
+//            objectType=objectExpr.type;
+//        }
+//        else
+//        {
+//            if(!currentScope.checkVariable(objectName,true))
+//                throw new SemanticError(expr.pos,"Undefined variable here");
+//            objectType=currentScope.getVariable(objectName,true);
+//        }
+
+//        debug.print(objectType.typeName());
+        if(objectType.typeName().equals("int") || objectType.typeName().equals("bool"))
+            throw new SemanticError(objectExpr.pos,"Unexpected method call from type <int> or <bool>");
+        if(objectType==null || objectType.typeName().equals("void") || objectType.typeName().equals("null"))
+            throw new SemanticError(objectExpr.pos,"Unexpected expression type of <void> or <null>");
 
         if(!globalScope.checkType(objectType.typeName()))
             throw new SemanticError(expr.pos,"Undefined type here");// Just for insurance.
@@ -336,30 +340,54 @@ public class SemanticChecker implements ASTVisitor
             throw new SemanticError(expr.index.pos,"Expect type <int> but <"+expr.index.type.typeName()+">");
 
         expr.name.accept(this);
-        if(expr.name instanceof IdExpression)
+        if(expr.name instanceof IndexExpression)
         {
-//            expr.type=new ArrayType(expr.pos,new BaseType(expr.pos,expr.name.type.typeName()));
-            expr.objName=((IdExpression) expr.name).identifier;
-
-            Type tempType=currentScope.getVariable(expr.objName, true);
-            if(!(tempType instanceof ArrayType))
-                throw new SemanticError(expr.pos,"Variable type error");
-            expr.type=((ArrayType) tempType).baseType;
-            expr.maxDimension=((ArrayType) tempType).dimension;
-        }
-        else
-        {
-            if(!(expr.name instanceof IndexExpression))
-                throw new SemanticError(expr.name.pos,"Unexpected expression type");
             if(!(expr.name.type instanceof ArrayType))
                 throw new SemanticError(expr.name.pos,"Unexpected expression type");
             Type exprType=((ArrayType) expr.name.type).baseType;
-            expr.maxDimension=((IndexExpression) expr.name).maxDimension;
+//            expr.maxDimension=((IndexExpression) expr.name).maxDimension;
             expr.type=exprType;
-            expr.objName=((IndexExpression) expr.name).objName;
-
+//            expr.objName=((IndexExpression) expr.name).objName;
+        }
+        else
+        {
+            Type tempType=expr.name.type;
+            if(!(tempType instanceof ArrayType))
+                throw new SemanticError(expr.pos,"Variable type error");
+            expr.type=((ArrayType) tempType).baseType;
+//            expr.maxDimension=((ArrayType) tempType).dimension;
         }
         expr.leftFlag=true;
+
+//        if(expr.name instanceof IdExpression || expr.name instanceof ClassExpression)
+//        {
+//            expr.type=new ArrayType(expr.pos,new BaseType(expr.pos,expr.name.type.typeName()));
+//            Type tempType=expr.name.type;
+
+//            if (expr.name instanceof IdExpression)
+//            {
+//                expr.objName=((IdExpression) expr.name).identifier;
+//                tempType=currentScope.getVariable(expr.objName, true);
+//            }
+//            tempType=expr.name.type;
+//            if(!(tempType instanceof ArrayType))
+//                throw new SemanticError(expr.pos,"Variable type error");
+//            expr.type=((ArrayType) tempType).baseType;
+//            expr.maxDimension=((ArrayType) tempType).dimension;
+//        }
+//        else
+//        {
+//            if(!(expr.name instanceof IndexExpression))
+//                throw new SemanticError(expr.name.pos,"Unexpected expression type");
+//            System.out.println(expr.name.type instanceof BaseType);
+//            if(!(expr.name.type instanceof ArrayType))
+//                throw new SemanticError(expr.name.pos,"Unexpected expression type");
+//            Type exprType=((ArrayType) expr.name.type).baseType;
+//            expr.maxDimension=((IndexExpression) expr.name).maxDimension;
+//            expr.type=exprType;
+//            expr.objName=((IndexExpression) expr.name).objName;
+//
+//        }
     }
 
     @Override public void visit(FuncExpression expr)
@@ -396,7 +424,7 @@ public class SemanticChecker implements ASTVisitor
                 if(!typeName.equals("int"))
                     throw new SemanticError(pos,"Except type <int> but <"+typeName+">.");
                 if(!expr.rightExpr.leftFlag)
-                    throw new SemanticError(pos,"Except lvalue here.");
+                    throw new SemanticError(pos,"Except lvalue here");
                 expr.leftFlag=true;
                 expr.type=new BaseType(pos,"int");
             }
@@ -425,10 +453,7 @@ public class SemanticChecker implements ASTVisitor
     @Override public void visit(ThisExpression expr)
     {
         if(currentScope.classFlag && currentScope.functionFlag)
-        {
-            expr.leftFlag=true;
             expr.type=currentScope.classType;
-        }
         else throw new SemanticError(expr.pos,"Unexpected appearance of <this>.");
     }
 
@@ -438,7 +463,7 @@ public class SemanticChecker implements ASTVisitor
         if(!expr.leftExpr.type.typeName().equals("int"))
             throw new SemanticError(expr.leftExpr.pos,"Except type <int> but <"+expr.leftExpr.type.typeName()+">.");
         if(!expr.leftExpr.leftFlag)
-            throw new SemanticError(expr.leftExpr.pos,"Except lvalue here.");
+            throw new SemanticError(expr.leftExpr.pos,"Except lvalue here");
         expr.type=new BaseType(expr.pos,"int");
     }
 
@@ -517,19 +542,22 @@ public class SemanticChecker implements ASTVisitor
         if(Objects.equals(currentScope,globalScope) && globalScope.checkType(def.name))
             throw new SemanticError(def.pos,"Variable name should not be same as a type");
 
+
         if(def.expr!=null)
         {
             def.expr.accept(this);
+            String typeName=def.type.typeName();
             if(def.expr.nullFlag)
             {
-                if(def.type.typeName().equals("int") || def.type.typeName().equals("bool"))
+                if((typeName.equals("int") || typeName.equals("bool")) && !(def.type instanceof ArrayType))
                     throw new SemanticError(def.expr.pos,"Null could not assign to <int> & <bool>");
             }
             else
             {
                 if(def.expr.type.typeName().equals("null"))
                 {
-                    if(def.type.typeName().equals("int") || def.type.typeName().equals("bool"))
+                    System.out.println(def.type instanceof ArrayType);
+                    if((typeName.equals("int") || typeName.equals("bool")) && !(def.type instanceof ArrayType))
                         throw new SemanticError(def.expr.pos,"Null could not assign to <int> & <bool>");
                 }
                 else if(!def.type.typeName().equals(def.expr.type.typeName()))
