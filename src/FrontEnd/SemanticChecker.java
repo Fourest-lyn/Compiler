@@ -174,17 +174,17 @@ public class SemanticChecker implements ASTVisitor
             case MUL,DIV,MOD,SUB,SHL,SHR,AND,OR,XOR ->
             {
                 if(!leftType.equals("int"))
-                    throw new SemanticError(expr.leftExpr.pos,"Expect value type <int> but <"+leftType+">.");
+                    throw new SemanticError(expr.leftExpr.pos,"Expect value type <int> but <"+leftType+">");
                 if(!rightType.equals("int"))
-                    throw new SemanticError(expr.rightExpr.pos,"Expect value type <int> but <"+rightType+">.");
+                    throw new SemanticError(expr.rightExpr.pos,"Expect value type <int> but <"+rightType+">");
                 expr.type=new BaseType(expr.pos,"int");
             }
             case ADD,GRE,GEQ,LES,LEQ ->
             {
                 if(!leftType.equals("int") && !leftType.equals("string"))
-                    throw new SemanticError(expr.leftExpr.pos,"Expect value type <int> or <string> but <"+leftType+">.");
+                    throw new SemanticError(expr.leftExpr.pos,"Expect value type <int> or <string> but <"+leftType+">");
                 if(!rightType.equals("int") && !rightType.equals("string"))
-                    throw new SemanticError(expr.rightExpr.pos,"Expect value type <int> or <string> but <"+rightType+">.");
+                    throw new SemanticError(expr.rightExpr.pos,"Expect value type <int> or <string> but <"+rightType+">");
                 if(!leftType.equals(rightType))
                     throw new SemanticError(expr.pos,"Expect same value type on both side.");
                 if(expr.op.equals(BinaryExpression.Operator.ADD)) expr.type=new BaseType(expr.pos,leftType);
@@ -199,9 +199,9 @@ public class SemanticChecker implements ASTVisitor
             case LOR,LAND ->
             {
                 if(!leftType.equals("bool"))
-                    throw new SemanticError(expr.leftExpr.pos,"Expect value type <bool> but <"+leftType+">.");
+                    throw new SemanticError(expr.leftExpr.pos,"Expect value type <bool> but <"+leftType+">");
                 if(!rightType.equals("bool"))
-                    throw new SemanticError(expr.rightExpr.pos,"Expect value type <bool> but <"+rightType+">.");
+                    throw new SemanticError(expr.rightExpr.pos,"Expect value type <bool> but <"+rightType+">");
                 expr.type=new BaseType(expr.pos,"bool");
             }
         }
@@ -224,8 +224,9 @@ public class SemanticChecker implements ASTVisitor
             {
                 if((leftType.equals("int") || leftType.equals("bool")) && !(expr.leftExpr.type instanceof ArrayType))
                     throw new SemanticError(expr.rightExpr.pos,"The type <int> & <bool> should not be null.");
+
             }
-            else throw new SemanticError(expr.pos,"Except same type on both side.");
+            else throw new SemanticError(expr.pos,"Except same type on both side");
         }
         expr.type=expr.rightExpr.type;
     }
@@ -252,7 +253,7 @@ public class SemanticChecker implements ASTVisitor
         Expression objectExpr=expr.objectName;
         String objectName;
         if(!(objectExpr instanceof IdExpression || objectExpr instanceof IndexExpression || (objectExpr instanceof ConstExpression && Objects.equals(((ConstExpression) objectExpr).kind, "string"))))
-            throw new SemanticError(expr.pos,"Unexpected expression type here");
+            throw new SemanticError(expr.pos,"Unexpected expression type");
         if(objectExpr instanceof IdExpression) objectName=((IdExpression) objectExpr).identifier;
         else if(objectExpr instanceof IndexExpression) objectName=((IndexExpression) objectExpr).objName;
         else objectName=((ConstExpression) objectExpr).kind;// consider: how to save the value of constValue.
@@ -315,21 +316,23 @@ public class SemanticChecker implements ASTVisitor
         expr.name.accept(this);
         if(expr.name instanceof IdExpression)
         {
-            expr.type=expr.name.type;
+//            expr.type=new ArrayType(expr.pos,new BaseType(expr.pos,expr.name.type.typeName()));
             expr.objName=((IdExpression) expr.name).identifier;
 
             Type tempType=currentScope.getVariable(expr.objName, true);
             if(!(tempType instanceof ArrayType))
                 throw new SemanticError(expr.pos,"Variable type error");
+            expr.type=((ArrayType) tempType).baseType;
             expr.maxDimension=((ArrayType) tempType).dimension;
         }
         else
         {
             if(!(expr.name instanceof IndexExpression))
                 throw new SemanticError(expr.name.pos,"Unexpected expression type");
-            ArrayType exprType=new ArrayType(expr.pos,expr.name.type);
-            if(exprType.dimension>expr.maxDimension)
-                throw new SemanticError(expr.pos,"Unexpected expression type");
+            if(!(expr.name.type instanceof ArrayType))
+                throw new SemanticError(expr.name.pos,"Unexpected expression type");
+            Type exprType=((ArrayType) expr.name.type).baseType;
+            expr.maxDimension=((IndexExpression) expr.name).maxDimension;
             expr.type=exprType;
             expr.objName=((IndexExpression) expr.name).objName;
 
@@ -437,16 +440,18 @@ public class SemanticChecker implements ASTVisitor
 
         currentScope=new Scope(currentScope);
         currentScope.functionType=def.returnType;
+//        debug.print(def.returnType.typeName());
         currentScope.functionFlag=true;
 
         if(def.paras!=null) currentScope.putParameters(def.paras);
         def.suite.accept(this);
+//        debug.print(currentScope.returnType.typeName());
         if(currentScope.returnType==null)
         {
-            if(!(currentScope.functionType instanceof VoidType))
+            if(!(currentScope.functionType instanceof VoidType) && !Objects.equals(def.funcName, "main"))
                 throw new SemanticError(def.pos,"Return type error");
         }
-        else if(currentScope.returnType!=currentScope.functionType && !Objects.equals(def.funcName, "main"))
+        else if(!Objects.equals(currentScope.returnType.typeName(), currentScope.functionType.typeName()))
             throw new SemanticError(def.pos,"Return type error");
 //        def.functionScope=currentScope;
         currentScope=currentScope.parentScope();
@@ -490,7 +495,6 @@ public class SemanticChecker implements ASTVisitor
         if(Objects.equals(currentScope,globalScope) && globalScope.checkType(def.name))
             throw new SemanticError(def.pos,"Variable name should not be same as a type");
 
-        currentScope.putVariable(def.type,def.name);
         if(def.expr!=null)
         {
             def.expr.accept(this);
@@ -505,6 +509,7 @@ public class SemanticChecker implements ASTVisitor
                     throw new SemanticError(def.expr.pos,"Incorrect Type of expression");
             }
         }
+        currentScope.putVariable(def.type,def.name);
     }
 
     /** Type */

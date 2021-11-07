@@ -6,6 +6,6 @@ public class SyntaxError extends Error
 {
     public SyntaxError(Position pos,String msg)
     {
-        super(pos,"Syntax Error: "+msg);
+        super(pos,"[Syntax Error] "+msg);
     }
 }

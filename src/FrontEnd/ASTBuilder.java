@@ -332,6 +332,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
 
     @Override public ASTNode visitLiteral(MxParser.LiteralContext ctx)
     {
+        debug.builder("Literal",ctx.getText());
         String kind=null;
         if(ctx.BOOLCONST()!=null) kind= "bool";
         if(ctx.NULLCONST()!=null) kind= "null";

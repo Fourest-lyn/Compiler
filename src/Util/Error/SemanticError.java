@@ -6,6 +6,6 @@ public class SemanticError extends Error
 {
     public SemanticError(Position pos,String msg)
     {
-        super(pos,"Semantic Error: "+msg);
+        super(pos,"[Semantic Error] "+msg);
     }
 }
