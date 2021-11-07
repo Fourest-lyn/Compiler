@@ -25,7 +25,7 @@ public class Main
     {
         // Only semantic check now.
         boolean semanticCheckLocalFlag=false;
-        String address="testcases/sema/builtin-func-package/builtin-4.mx";
+        String address="testcases/sema/class-package/class-16.mx";
         //consider: basic-68
 
         var input=System.in;

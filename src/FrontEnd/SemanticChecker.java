@@ -482,6 +482,9 @@ public class SemanticChecker implements ASTVisitor
 
     @Override public void visit(FunctionDefine def)
     {
+        if(globalScope.checkType(def.funcName))
+            throw new SemanticError(def.pos,"Function name should not be reversed words or class name");
+
         def.returnType.accept(this);
 
 //        if(globalScope.checkFuncName(def.funcName))
@@ -532,11 +535,12 @@ public class SemanticChecker implements ASTVisitor
     @Override public void visit(ConstructDefine def)
     {
         if(!currentScope.classFlag)
-            throw new SemanticError(def.pos,"Constructor not in class.");
+            throw new SemanticError(def.pos,"Constructor not in class");
         if(!def.name.equals(currentScope.classType.typeName()))
-            throw new SemanticError(def.pos,"Unexpected Constructor name.");
+            throw new SemanticError(def.pos,"Unexpected Constructor name");
 
         currentScope=new Scope(currentScope);
+        currentScope.functionFlag=true;
         def.suite.accept(this);
         currentScope=currentScope.parentScope();
     }
@@ -545,6 +549,8 @@ public class SemanticChecker implements ASTVisitor
     {
         if(!(currentScope.classFlag && !currentScope.functionFlag) && currentScope.checkVariable(def.name,false))
             throw new SemanticError(def.pos,"Variable name already exists");
+        if(globalScope.checkType(def.name))
+            throw new SemanticError(def.pos,"Variable name should not be reversed word or class name");
         if(Objects.equals(currentScope,globalScope) && globalScope.checkType(def.name))
             throw new SemanticError(def.pos,"Variable name should not be same as a type");
 
