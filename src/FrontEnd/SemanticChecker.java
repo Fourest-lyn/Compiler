@@ -111,13 +111,13 @@ public class SemanticChecker implements ASTVisitor
     @Override public void visit(BreakStatement stmt)
     {
         if(currentScope.loopStage==0)
-            throw new SemanticError(stmt.pos,"Unexpected break.");
+            throw new SemanticError(stmt.pos,"Unexpected break");
     }
 
     @Override public void visit(ContinueStatement stmt)
     {
         if(currentScope.loopStage==0)
-            throw new SemanticError(stmt.pos,"Unexpected continue.");
+            throw new SemanticError(stmt.pos,"Unexpected continue");
     }
 
     @Override public void visit(WhileStatement stmt)
@@ -562,7 +562,7 @@ public class SemanticChecker implements ASTVisitor
             {
                 if(def.expr.type.typeName().equals("null"))
                 {
-                    System.out.println(def.type instanceof ArrayType);
+//                    System.out.println(def.type instanceof ArrayType);
                     if((typeName.equals("int") || typeName.equals("bool")) && !(def.type instanceof ArrayType))
                         throw new SemanticError(def.expr.pos,"Null could not assign to <int> & <bool>");
                 }
