@@ -24,4 +24,9 @@ public class ArrayType extends Type
     }
 
     @Override public void accept(ASTVisitor visitor) {visitor.visit(this);}
+    @Override public boolean equals(Object obj)
+    {
+        if(!(obj instanceof ArrayType)) return false;
+        return this.baseType.equals(((ArrayType) obj).baseType);
+    }
 }

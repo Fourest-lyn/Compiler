@@ -225,13 +225,12 @@ public class SemanticChecker implements ASTVisitor
         if(!expr.leftExpr.leftFlag)
             throw new SemanticError(expr.leftExpr.pos,"Except a lvalue but not");
 
-        if(!leftType.equals(rightType))
+        if(!expr.leftExpr.type.equals(expr.rightExpr.type))
         {
             if(rightType.equals("null"))
             {
                 if((leftType.equals("int") || leftType.equals("bool")) && !(expr.leftExpr.type instanceof ArrayType))
                     throw new SemanticError(expr.rightExpr.pos,"The type <int> & <bool> should not be null.");
-
             }
             else throw new SemanticError(expr.pos,"Except same type on both side");
         }
@@ -336,14 +335,14 @@ public class SemanticChecker implements ASTVisitor
     {
         debug.module("IndexExpression");
         expr.index.accept(this);
-        if(!expr.index.type.typeName().equals("int"))
-            throw new SemanticError(expr.index.pos,"Expect type <int> but <"+expr.index.type.typeName()+">");
+        if(!expr.index.type.equals(new BaseType(expr.pos,"int")))
+            throw new SemanticError(expr.index.pos,"Unexpected type in index");
 
         expr.name.accept(this);
         if(expr.name instanceof IndexExpression)
         {
             if(!(expr.name.type instanceof ArrayType))
-                throw new SemanticError(expr.name.pos,"Unexpected expression type");
+                throw new SemanticError(expr.name.pos,"Incorrect array dimension");
             Type exprType=((ArrayType) expr.name.type).baseType;
 //            expr.maxDimension=((IndexExpression) expr.name).maxDimension;
             expr.type=exprType;
@@ -560,8 +559,9 @@ public class SemanticChecker implements ASTVisitor
                     if((typeName.equals("int") || typeName.equals("bool")) && !(def.type instanceof ArrayType))
                         throw new SemanticError(def.expr.pos,"Null could not assign to <int> & <bool>");
                 }
-                else if(!def.type.typeName().equals(def.expr.type.typeName()))
+                else if(!def.type.equals(def.expr.type))
                     throw new SemanticError(def.expr.pos,"Incorrect Type of expression");
+
             }
         }
         currentScope.putVariable(def.type,def.name);
@@ -636,8 +636,8 @@ public class SemanticChecker implements ASTVisitor
         for(var it: tool.expressions)
         {
             it.accept(this);
-            if(!it.type.typeName().equals("int"))
-                throw new SemanticError(it.pos,"Expect type <int> but <"+it.type.typeName()+">.");
+            if(!it.type.equals(new BaseType(tool.pos,"int")))
+                throw new SemanticError(it.pos,"Unexpected type in index");
         }
         Type type=new BaseType(tool.pos,tool.baseType.typeName());
         for(int i=0;i<tool.dimension;++i) type=new ArrayType(tool.pos,type);

@@ -102,7 +102,7 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
 
     @Override public ASTNode visitWrongInitial(MxParser.WrongInitialContext ctx)
     {
-        throw new SyntaxError(new Position(ctx),"Unexpected grammar to initial array.");
+        throw new SyntaxError(new Position(ctx),"Unexpected grammar to initial array");
     }
 
     @Override public ASTNode visitReturnType(MxParser.ReturnTypeContext ctx)

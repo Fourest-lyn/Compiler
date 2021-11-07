@@ -25,7 +25,7 @@ public class Main
     {
         // Only semantic check now.
         boolean semanticCheckLocalFlag=false;
-        String address="testcases/sema/basic-package/basic-71.mx";
+        String address="testcases/sema/array-package/array-11.mx";
         //consider: basic-68
 
         var input=System.in;
