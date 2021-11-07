@@ -4,6 +4,7 @@ import AST.ASTNode;
 import AST.ASTVisitor;
 import AST.StmtNode.BlockStatement;
 import AST.StmtNode.Statement;
+import AST.TypeNode.Type;
 import Util.Position;
 
 public class LambdaFunction extends ASTNode
@@ -11,6 +12,7 @@ public class LambdaFunction extends ASTNode
     public FunctionParameter paras;
     public BlockStatement suite;
     public ValueList valuelist;
+    public Type returnType;
 
     public LambdaFunction(Position pos,FunctionParameter paras,BlockStatement suite,ValueList valuelist)
     {

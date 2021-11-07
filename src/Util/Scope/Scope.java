@@ -18,7 +18,7 @@ public class Scope
     protected Map<String, Type> variables;
     public boolean classFlag=false,functionFlag=false;
     public Type classType=null;
-    public Type functionType=null;
+    public Type functionType=null,returnType=null;
     public int loopStage=0;
 
     public Scope(Scope parentScope)

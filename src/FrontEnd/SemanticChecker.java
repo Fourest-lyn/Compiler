@@ -80,7 +80,6 @@ public class SemanticChecker implements ASTVisitor
     {
         if(!currentScope.functionFlag)
             throw new SemanticError(stmt.pos,"Unexpected appearance of <return>.");
-
         if(stmt.expr!=null)
         {
             stmt.expr.accept(this);
@@ -94,6 +93,7 @@ public class SemanticChecker implements ASTVisitor
                 if(currentScope.functionType.typeName().equals("int") || currentScope.functionType.typeName().equals("bool"))
                     throw new SemanticError(stmt.pos,"Null could not assign to <int> & <bool>.");
             }
+            currentScope.returnType=stmt.expr.type;
         }
         else
         {
@@ -151,8 +151,10 @@ public class SemanticChecker implements ASTVisitor
         {
             currentScope=new Scope(currentScope);
             for(var it: stmt.stmts) it.accept(this);
+            currentScope.parentScope().returnType=currentScope.returnType;
             currentScope=currentScope.parentScope();
         }
+
     }
 
     @Override public void visit(EmptyStatement stmt) {}
@@ -389,7 +391,11 @@ public class SemanticChecker implements ASTVisitor
 
     }
 
-    @Override public void visit(LambdaExpression expr) {expr.lambda.accept(this);}
+    @Override public void visit(LambdaExpression expr)
+    {
+        expr.lambda.accept(this);
+        expr.type=expr.lambda.returnType;
+    }
 
     @Override public void visit(ThisExpression expr)
     {
@@ -435,7 +441,13 @@ public class SemanticChecker implements ASTVisitor
 
         if(def.paras!=null) currentScope.putParameters(def.paras);
         def.suite.accept(this);
-
+        if(currentScope.returnType==null)
+        {
+            if(!(currentScope.functionType instanceof VoidType))
+                throw new SemanticError(def.pos,"Return type error");
+        }
+        else if(currentScope.returnType!=currentScope.functionType && !Objects.equals(def.funcName, "main"))
+            throw new SemanticError(def.pos,"Return type error");
 //        def.functionScope=currentScope;
         currentScope=currentScope.parentScope();
 //        currentScope.putFunction(def);
@@ -549,6 +561,9 @@ public class SemanticChecker implements ASTVisitor
         currentScope.putParameters(tool.paras);
         currentScope.functionFlag=true;
         tool.suite.accept(this);
+        if(currentScope.returnType==null) tool.returnType=new VoidType(tool.pos);
+        else tool.returnType=currentScope.returnType;
+//            throw new SemanticError(tool.pos,"Expect a return statement");
         currentScope=currentScope.parentScope();
     }
 
