@@ -25,12 +25,11 @@ public class Main
     {
         // Only semantic check now.
         boolean semanticCheckLocalFlag=false;
-        var input=System.in;
+        String address="testcases/sema/basic-package/basic-23.mx";
 
-        if(semanticCheckLocalFlag)
-        {
-            input=new FileInputStream("testcases/sema/basic-package/basic-7.mx");
-        }
+        var input=System.in;
+        if(semanticCheckLocalFlag) input=new FileInputStream(address);
+
         try
         {
 

@@ -87,7 +87,7 @@ public class SemanticChecker implements ASTVisitor
             if(!stmt.expr.nullFlag)
             {
                 if(!stmt.expr.type.typeName().equals(currentScope.functionType.typeName()))
-                    throw new SemanticError(stmt.pos,"Unmatched return type.");
+                    throw new SemanticError(stmt.pos,"Unmatched return type");
             }
             else
             {
@@ -214,7 +214,7 @@ public class SemanticChecker implements ASTVisitor
         String leftType=expr.leftExpr.type.typeName();
         String rightType=expr.rightExpr.type.typeName();
         if(!expr.leftExpr.leftFlag)
-            throw new SemanticError(expr.leftExpr.pos,"Except a lvalue but not.");
+            throw new SemanticError(expr.leftExpr.pos,"Except a lvalue but not");
 
         if(!leftType.equals(rightType))
         {
@@ -249,10 +249,11 @@ public class SemanticChecker implements ASTVisitor
         expr.objectName.accept(this);
         Expression objectExpr=expr.objectName;
         String objectName;
-        if(!(objectExpr instanceof IdExpression || objectExpr instanceof IndexExpression))
+        if(!(objectExpr instanceof IdExpression || objectExpr instanceof IndexExpression || (objectExpr instanceof ConstExpression && Objects.equals(((ConstExpression) objectExpr).kind, "string"))))
             throw new SemanticError(expr.pos,"Unexpected expression type here");
         if(objectExpr instanceof IdExpression) objectName=((IdExpression) objectExpr).identifier;
-        else objectName=((IndexExpression) objectExpr).objName;
+        else if(objectExpr instanceof IndexExpression) objectName=((IndexExpression) objectExpr).objName;
+        else objectName=((ConstExpression) objectExpr).kind;// consider: how to save the value of constValue.
 
         // Check for ArrayType's size() method.
         if(expr.objectName.type instanceof ArrayType && Objects.equals(expr.methodName,"size"))
@@ -263,9 +264,17 @@ public class SemanticChecker implements ASTVisitor
             return;
         }
 
-        if(!currentScope.checkVariable(objectName,true))
-            throw new SemanticError(expr.pos,"Undefined variable here");
-        Type objectType=currentScope.getVariable(objectName,true);
+        Type objectType=null;
+        if(objectExpr instanceof ConstExpression)
+        {
+            objectType=new BaseType(objectExpr.pos,"string");
+        }
+        else
+        {
+            if(!currentScope.checkVariable(objectName,true))
+                throw new SemanticError(expr.pos,"Undefined variable here");
+            objectType=currentScope.getVariable(objectName,true);
+        }
 
         if(!globalScope.checkType(objectType.typeName()))
             throw new SemanticError(expr.pos,"Undefined type here");// Just for insurance.
@@ -277,9 +286,12 @@ public class SemanticChecker implements ASTVisitor
             if(!classDefine.classScope.containsFunction(methodName,false))
                 throw new SemanticError(expr.pos,"Undefined method/function here");
             FunctionDefine function=classDefine.classScope.getFunction(methodName,false);
-            expr.values.accept(this);
-            if(expr.values.expressions.size()!=function.paras.names.size())
+            if(expr.values==null && function.paras==null);
+            else if(expr.values==null || function.paras==null)
+                throw new SemanticError(expr.pos,"Incorrect number of parameters");
+            else if(expr.values.expressions.size()!=function.paras.names.size())
                 throw new SemanticError(expr.values.pos,"Incorrect number of parameters");
+            if(expr.values!=null) expr.values.accept(this);
             expr.type=function.returnType;
         }
         else
@@ -303,13 +315,22 @@ public class SemanticChecker implements ASTVisitor
         {
             expr.type=expr.name.type;
             expr.objName=((IdExpression) expr.name).identifier;
+
+            Type tempType=currentScope.getVariable(expr.objName, true);
+            if(!(tempType instanceof ArrayType))
+                throw new SemanticError(expr.pos,"Variable type error");
+            expr.maxDimension=((ArrayType) tempType).dimension;
         }
         else
         {
             if(!(expr.name instanceof IndexExpression))
                 throw new SemanticError(expr.name.pos,"Unexpected expression type");
-            expr.type=new ArrayType(expr.pos,expr.name.type);
+            ArrayType exprType=new ArrayType(expr.pos,expr.name.type);
+            if(exprType.dimension>expr.maxDimension)
+                throw new SemanticError(expr.pos,"Unexpected expression type");
+            expr.type=exprType;
             expr.objName=((IndexExpression) expr.name).objName;
+
         }
         expr.leftFlag=true;
     }
@@ -456,6 +477,7 @@ public class SemanticChecker implements ASTVisitor
             throw new SemanticError(def.pos,"Variable name already exists");
         if(Objects.equals(currentScope,globalScope) && globalScope.checkType(def.name))
             throw new SemanticError(def.pos,"Variable name should not be same as a type");
+
         currentScope.putVariable(def.type,def.name);
         if(def.expr!=null)
         {

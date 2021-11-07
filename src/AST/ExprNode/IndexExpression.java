@@ -7,6 +7,7 @@ public class IndexExpression extends Expression
 {
     public Expression name,index;
     public String objName;
+    public int maxDimension=0;
     public IndexExpression(Position pos,Expression name,Expression index)
     {
         super(pos);
