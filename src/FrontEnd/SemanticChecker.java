@@ -69,6 +69,7 @@ public class SemanticChecker implements ASTVisitor
         {
             currentScope=new Scope(currentScope);
             stmt.trueStmt.accept(this);
+            currentScope.parentScope().returnType=currentScope.returnType;
             currentScope=currentScope.parentScope();
         }
         else throw new SemanticError(stmt.pos,"Expect statements when condition is true.");
@@ -77,6 +78,7 @@ public class SemanticChecker implements ASTVisitor
         {
             currentScope=new Scope(currentScope);
             stmt.falseStmt.accept(this);
+            currentScope.parentScope().returnType=currentScope.returnType;
             currentScope=currentScope.parentScope();
         }
     }
@@ -90,8 +92,17 @@ public class SemanticChecker implements ASTVisitor
             stmt.expr.accept(this);
             if(!stmt.expr.nullFlag)
             {
-                if(!stmt.expr.type.equals(currentScope.functionType))
-                    throw new SemanticError(stmt.pos,"Unmatched return type");
+                Type type=stmt.expr.type;
+                Position pos=stmt.expr.pos;
+                if(type.equals(new BaseType(pos,"null")))
+                {
+                    if(type.equals(new BaseType(pos,"int")))
+                        throw new SemanticError(pos,"Null should not assign to int");
+                    if(type.equals(new BaseType(pos,"bool")))
+                        throw new SemanticError(pos,"Null should not assign to bool");
+                }
+                else if(!type.equals(currentScope.functionType))
+                    throw new SemanticError(pos,"Unmatched return type");
             }
             else
             {
@@ -130,6 +141,7 @@ public class SemanticChecker implements ASTVisitor
             currentScope=new Scope(currentScope);
             currentScope.loopStage++;
             stmt.stmt.accept(this);
+            currentScope.parentScope().returnType=currentScope.returnType;
             currentScope=currentScope.parentScope();
         }
     }
@@ -149,6 +161,7 @@ public class SemanticChecker implements ASTVisitor
             currentScope=new Scope(currentScope);
             currentScope.loopStage++;
             stmt.stmt.accept(this);
+            currentScope.parentScope().returnType=currentScope.returnType;
             currentScope=currentScope.parentScope();
         }
     }
