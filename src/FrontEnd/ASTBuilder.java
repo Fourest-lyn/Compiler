@@ -132,10 +132,12 @@ public class ASTBuilder extends MxBaseVisitor<ASTNode>
 
     @Override public ASTNode visitLambdaFunction(MxParser.LambdaFunctionContext ctx)
     {
+        debug.builder("LambdaFunction",ctx.getText());
         FunctionParameter paras=null;
         if(ctx.functionParameter()!=null) paras=(FunctionParameter) visit(ctx.functionParameter());
         BlockStatement suite= (BlockStatement) visit(ctx.suite());
-        ValueList valueList= (ValueList) visit(ctx.valueList());
+        ValueList valueList=null;
+        if(ctx.valueList()!=null) valueList= (ValueList) visit(ctx.valueList());
         return new LambdaFunction(new Position(ctx),paras,suite,valueList);
     }
 

@@ -85,6 +85,7 @@ public class SemanticChecker implements ASTVisitor
 
     @Override public void visit(ReturnStatement stmt)
     {
+        debug.module("ReturnStatement");
         if(!currentScope.functionFlag)
             throw new SemanticError(stmt.pos,"Unexpected appearance of <return>.");
         if(stmt.expr!=null)
@@ -571,7 +572,7 @@ public class SemanticChecker implements ASTVisitor
         if(Objects.equals(currentScope,globalScope) && globalScope.checkType(def.name))
             throw new SemanticError(def.pos,"Variable name should not be same as a type");
 
-
+        debug.module(def.name);
         if(def.expr!=null)
         {
             def.expr.accept(this);
@@ -631,11 +632,14 @@ public class SemanticChecker implements ASTVisitor
 
     @Override public void visit(LambdaFunction tool)
     {
+        debug.module("LambdaFunction");
         if(tool.valuelist==null && tool.paras==null)
         {
             currentScope=new Scope(currentScope);
             currentScope.functionFlag=true;
             tool.suite.accept(this);
+            if(currentScope.returnType==null) tool.returnType=new VoidType(tool.pos);
+            else tool.returnType=currentScope.returnType;
             currentScope=currentScope.parentScope();
             return;
         }

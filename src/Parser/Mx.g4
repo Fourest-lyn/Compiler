@@ -18,7 +18,7 @@ newType
 returnType: type | VOID;
 functionParameter: type IDENTIFIER (',' type IDENTIFIER)*;
 functionDefine: returnType IDENTIFIER '(' functionParameter? ')' suite;
-lambdaFunction: '[''&'']'('('functionParameter?')')? '->' suite '('valueList')';
+lambdaFunction: '[''&'']'('('functionParameter?')')? '->' suite '('valueList?')';
 
 classConstructor: IDENTIFIER '('')' suite;
 classDefine: CLASS IDENTIFIER '{' (valueDefine | classConstructor | functionDefine)* '}'';';
