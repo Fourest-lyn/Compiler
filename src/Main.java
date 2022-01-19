@@ -18,6 +18,7 @@ import java.io.FileInputStream;
  * Author: Fourest
  */
 
+//todo: processing IR!
 
 public class Main
 {
