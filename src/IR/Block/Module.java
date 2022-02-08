@@ -1,8 +1,6 @@
-package IR;
+package IR.Block;
 
-import IR.BasicBlock;
-import IR.Function;
-import IR.IRVisitor;
+import IR.Constructor.IRVisitor;
 
 import java.util.LinkedHashMap;
 

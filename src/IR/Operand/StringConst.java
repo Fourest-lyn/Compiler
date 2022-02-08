@@ -11,23 +11,21 @@ public class StringConst extends IROperand
     private void processValue()
     {
         String temp=value;
-        temp.replace("\\","\\5C").replace("\n","\\0A");
-        temp.replace("\"","\\22").replace("\t","\\09");
-        temp.replace("\0","\\00");
-        outputValue=temp;
+        temp.replace("\\","\\5C")
+                .replace("\n","\\0A")
+                .replace("\"","\\22")
+                .replace("\t","\\09")
+                .replace("\0","\\00");
+        outputValue="c\""+temp+"\\00\"";
     }
 
     public StringConst(String value)
     {
-        super(new PointerType(new IntegerType(8)));
+        super(new PointerType(new IntegerType(8)),"string_const");
         this.value=value;
         processValue();
     }
 
-    @Override
-    public String toString()
-    {
-        //todo: may need fix
-        return outputValue;
-    }
+    //consider: how to use
+    public String formatValue() {return outputValue;}
 }

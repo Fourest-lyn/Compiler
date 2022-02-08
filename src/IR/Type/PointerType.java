@@ -5,7 +5,7 @@ import IR.Operand.NullPointerConst;
 
 public class PointerType extends IRType
 {
-    IRType baseType;
+    public IRType baseType;
 
     public PointerType(IRType baseType)
     {
@@ -15,7 +15,7 @@ public class PointerType extends IRType
     @Override
     public int size()
     {
-        return 4; //consider: may need fix
+        return 4; //32 bits
     }
 
     @Override
@@ -27,7 +27,6 @@ public class PointerType extends IRType
     @Override
     public IROperand getValue()
     {
-        //consider: may need fix
         return new NullPointerConst();
     }
 }

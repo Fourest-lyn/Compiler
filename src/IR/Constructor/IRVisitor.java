@@ -1,12 +1,15 @@
-package IR;
+package IR.Constructor;
 
+import IR.Block.BasicBlock;
+import IR.Block.Function;
+import IR.Block.Module;
 import IR.Instruction.*;
 
 public interface IRVisitor
 {
-    public void visit(BasicBlock    obj);
-    public void visit(Function      obj);
-    public void visit(Module        obj);
+    public void visit(BasicBlock obj);
+    public void visit(Function obj);
+    public void visit(Module obj);
 
     public void visit(AllocaInstr   instr);
     public void visit(BinaryInstr   instr);

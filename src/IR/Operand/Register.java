@@ -2,12 +2,13 @@ package IR.Operand;
 
 import IR.Type.IRType;
 
+//consider: This may need delete...?
 public class Register extends IROperand
 {
-    private String name;
+    protected String name;
     public Register(String name, IRType baseType)
     {
-        super(baseType);
+        super(baseType,name);
         this.name=name;
     }
 

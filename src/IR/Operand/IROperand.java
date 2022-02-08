@@ -1,10 +1,9 @@
 package IR.Operand;
 
+import IR.Base.User;
 import IR.Type.IRType;
 
-abstract public class IROperand
+abstract public class IROperand extends User
 {
-    private IRType type;
-    public IROperand(IRType type) {this.type=type;}
-    abstract public String toString();
+    public IROperand(IRType type,String name) {super(type,name);}
 }
