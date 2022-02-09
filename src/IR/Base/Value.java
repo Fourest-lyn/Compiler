@@ -7,15 +7,18 @@ import java.util.HashMap;
 
 public class Value
 {
-    private static HashMap<String,Integer> renameTable;
+//    private static HashMap<String,Integer> renameTable;
 
     public IRType type;
     protected String name;
 
+    //consider:???
+    public Value resolveFrom=null;
+
     public Value(IRType type,String name)
     {
         this.type=type;
-        this.name=name;//todo: need to rename it
+        this.name=name;//consider: maybe need to rename it
     }
 
     public String name() {return "%"+this.name;}
